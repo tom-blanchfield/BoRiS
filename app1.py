@@ -24,13 +24,13 @@ tags_to_include = ['young-adult', 'literature', 'romance', 'mystery', 'science-f
 st.sidebar.title("Please choose your favourite authors, and or genres")
 
 # Allow the user to select multiple authors
-selected_authors = st.sidebar.multiselect("Select authors", books['authors'])
+selected_authors = st.sidebar.multiselect("Select authors", books['authors'].apply(lambda x: x.split(',')[0].strip()))
 
 #Allow the user to select multiple genres
 selected_tags = st.sidebar.multiselect("Select genres", tags_to_include)
 
 # Modify the filtered data based on the selected authors
-filtered_data = book_data[book_data['authors'].isin(selected_authors) | book_data['tag_name'].isin(selected_tags)]
+filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors) | book_data['tag_name'].isin(selected_tags)]
 
 # Group by book and sort by count
 grouped_data = filtered_data.groupby('title')['count'].sum().sort_values(ascending=False)
