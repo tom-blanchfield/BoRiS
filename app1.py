@@ -54,7 +54,7 @@ else:
 
         
     if st.button("Get Recommendations!"):
-        # Get the ratings of the top 10,000 raters
+        # Get the ratings of the top 5,000 raters
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
@@ -66,7 +66,7 @@ else:
         # Replace missing values with median
         user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
 
-        # Get ratings of top 10,000 raters
+        # Get ratings of top 5,000 raters
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)].pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
         # Merge user's ratings with top raters ratings
