@@ -26,7 +26,9 @@ unique_authors = books['authors'].unique()
 st.sidebar.title("Please choose your favourite authors and/or genres")
 
 # Allow the user to select multiple authors
-selected_authors = st.sidebar.multiselect("Select authors", unique_authors)
+selected_authors = st.sidebar.multiselect("Select authors", list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
+
+
 
 # Allow the user to select multiple genres
 selected_tags = st.sidebar.multiselect("Select genres", tags_to_include)
