@@ -17,7 +17,7 @@ book_data = pd.merge(book_data, tags, on='tag_id')
 tags_df = book_data.groupby('tag_name').size().reset_index(name='counts').sort_values('counts', ascending=False).head(1000)
 
 # Tags to include in the "genres" multi-select dropdown
-tags_to_include = ['young-adult', 'literature', 'romance', 'mystery', 'science-fiction', 'fantasy', 'horror', 'thriller', 'western', 'dystopian', 'memoir', 'biography', 'autobiography', 'history', 'travel', 'cookbook', 'self-help', 'business', 'finance', 'psychology', 'philosophy', 'religion', 'art', 'music', 'comics', 'graphic novels', 'poetry', 'sport', 'humorous', 'war', 'funny']
+tags_to_include = ['comedy', 'literature', 'young-adult', 'romance', 'mystery', 'science-fiction', 'fantasy', 'horror', 'thriller', 'western', 'dystopian', 'memoir', 'biography', 'autobiography', 'history', 'travel', 'cookbook', 'self-help', 'business', 'finance', 'psychology', 'philosophy', 'religion', 'art', 'music', 'comics', 'graphic novels', 'poetry', 'sport', 'humorous', 'war', 'funny']
 
 # Extract unique authors
 unique_authors = books['authors'].unique()
