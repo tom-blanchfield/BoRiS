@@ -24,7 +24,9 @@ tags_to_include = ['literature', 'comedy', 'young-adult', 'romance', 'mystery', 
 st.sidebar.title("Please choose your favourite authors, and or genres")
 
 # Allow the user to select multiple authors
-selected_authors = st.sidebar.multiselect("Select authors", books['authors'].apply(lambda x: x.split(',')[0].strip()))
+selected_authors = st.sidebar.multiselect("Select authors", list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
+
+
 
 #Allow the user to select multiple genres
 selected_tags = st.sidebar.multiselect("Select genres", tags_to_include)
@@ -32,7 +34,7 @@ selected_tags = st.sidebar.multiselect("Select genres", tags_to_include)
 # Modify the filtered data based on the selected authors
 filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors) | book_data['tag_name'].isin(selected_tags)]
 
-# Group by book and sort by count
+# Group by book and sort by count on
 grouped_data = filtered_data.groupby('title')['count'].sum().sort_values(ascending=False)
 
 # Get top 10,000 raters
