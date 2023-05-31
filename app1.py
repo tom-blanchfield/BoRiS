@@ -68,7 +68,7 @@ else:
             st.write(f"Error loading image: {e}")
             
         # Ask the user to rate the book
-        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title, width=200)
+        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
 
         # Store the user's rating in the DataFrame
         user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
