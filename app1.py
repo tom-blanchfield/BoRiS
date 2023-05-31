@@ -50,8 +50,25 @@ if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
     for title, count in grouped_data[:50].items():
-        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
+        # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
+        image_url = books.loc[books['title'] == title, 'image_url'].values[0]
+
+        # Download the image from the URL
+        try:
+            response = requests.get(image_url, stream=True)
+            response.raise_for_status()
+            image = Image.open(response.raw)
+            
+            # Adjust the image size
+            st.image(image, caption=title, use_column_width=True, width=0.5)
+        except (requests.HTTPError, OSError) as e:
+            st.write(f"Error loading image: {e}")
+            
+        # Ask the user to rate the book
+        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
+
+        # Store the user's rating in the DataFrame
         user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
 
         
