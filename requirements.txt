@@ -3,4 +3,4 @@ numpy
 scikit-learn
 streamlit
 pil
-requests
+
