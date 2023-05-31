@@ -54,7 +54,7 @@ else:
     for title, count in grouped_data[:50].items():
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
-        image_url = books.loc[books['title'] == title, 'small_image_url'].values[0]
+        image_url = books.loc[books['title'] == title, 'image_url'].values[0]
 
         # Download the image from the URL
         try:
