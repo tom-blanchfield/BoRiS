@@ -4,7 +4,7 @@ import sklearn as sk
 from sklearn.metrics.pairwise import cosine_similarity
 import requests
 import streamlit as st
-import PIL
+from PIL import image
 
 # Load the data
 books = pd.read_csv('books.csv')
