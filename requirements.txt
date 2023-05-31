@@ -2,6 +2,5 @@ pandas
 numpy
 scikit-learn
 streamlit
-pil
-requests
+
 
