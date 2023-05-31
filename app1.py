@@ -39,9 +39,9 @@ filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].s
 # Group by book and sort by count on
 grouped_data = filtered_data.groupby('title')['count'].sum().sort_values(ascending=False)
 
-# Get top 10,000 raters
+# Get top 5,000 raters
 ratings_count = ratings.groupby('user_id').size().reset_index(name='count').sort_values('count', ascending=False)
-top_raters = ratings_count[:1000]['user_id'].tolist()
+top_raters = ratings_count[:5000]['user_id'].tolist()
 
 # Create a DataFrame to store user ratings
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
@@ -51,7 +51,7 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    for title, count in grouped_data[:50].items():
+    for title, count in grouped_data[:20].items():
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         image_url = books.loc[books['title'] == title, 'image_url'].values[0]
@@ -75,7 +75,7 @@ else:
 
         
     if st.button("Get Recommendations!"):
-        # Get the ratings of the top 10,000 raters
+        # Get the ratings of the top 5,000 raters
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
@@ -87,7 +87,7 @@ else:
         # Replace missing values with median
         user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
 
-        # Get ratings of top 10,000 raters
+        # Get ratings of top 5,000 raters
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)].pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
         # Merge user's ratings with top raters ratings
@@ -108,7 +108,7 @@ else:
         recommended_books = []
         recommended_ids = []
         for book_id in top_rated_books.index:
-            if len(recommended_books) >= 100:
+            if len(recommended_books) >= 20:
                 break
             title = books.loc[books['book_id'] == book_id, 'title'].values[0]
             authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
