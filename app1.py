@@ -63,7 +63,7 @@ else:
             image = Image.open(response.raw)
             
             # Adjust the image size
-            st.image(image, caption=title, use_column_width=auto)
+            st.image(image, caption=title, use_column_width=never)
         except (requests.HTTPError, OSError) as e:
             st.write(f"Error loading image: {e}")
             
