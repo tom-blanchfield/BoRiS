@@ -3,7 +3,7 @@ import numpy as np
 import sklearn as sk
 from sklearn.metrics.pairwise import cosine_similarity
 import streamlit as st
-from PIL import Image
+from PIL import image
 import requests
 
 # Load the data
