@@ -3,5 +3,7 @@ numpy
 scikit-learn
 streamlit
 requests
-
+altair
+seaborn
+matplotlib
 
