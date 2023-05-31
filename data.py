@@ -138,23 +138,7 @@ if option == "Get cosine similarities of top 1,000 raters":
     plt.title("Cosine Similarity Heatmap of top 1,000 raters")
     st.pyplot()
     
-    # Add a button to generate cosine similarities for 5,000 top raters
-if option == "Get cosine similarities of top 5,000 raters":
-    top_users = ratings['user_id'].value_counts().index[:5000]
-    # Filter ratings by top users
-    ratings_top = ratings[ratings['user_id'].isin(top_users)]
-    # Convert ratings to a sparse matrix
-    user_book_ratings = pd.pivot_table(ratings_top, values='rating', index=['user_id'], columns=['book_id'])
-    user_book_ratings = user_book_ratings.fillna(0)
-    user_book_ratings_sparse = sk.preprocessing.normalize(user_book_ratings, axis=0)
-    # Compute cosine similarity between users
-    sim = cos_sim(user_book_ratings_sparse)
-    # Convert cosine similarity to DataFrame
-    sim_df = pd.DataFrame(sim)
-    # Plot heatmap
-    sns.heatmap(sim_df, cmap="YlGnBu", xticklabels=False, yticklabels=False)
-    plt.title("Cosine Similarity Heatmap of top 5,000 raters")
-    st.pyplot()
+
 
 
 
