@@ -40,7 +40,7 @@ grouped_data = filtered_data.groupby('title')['count'].sum().sort_values(ascendi
 
 # Get top 1,000 raters
 ratings_count = ratings.groupby('user_id').size().reset_index(name='count').sort_values('count', ascending=False)
-top_raters = ratings_count[:10000]['user_id'].tolist()
+top_raters = ratings_count[:1000]['user_id'].tolist()
 
 # Create a DataFrame to store user ratings
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
