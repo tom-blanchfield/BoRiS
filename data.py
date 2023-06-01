@@ -19,7 +19,7 @@ st.set_page_config(page_title="Book Explorer")
 
 # Create a sidebar with options
 st.sidebar.title("Explore the Book Data")
-option = st.sidebar.selectbox("Select an option", ("Books", "Book Tags", "Ratings", "Get cosine similarities of top 100 raters", "Get cosine similarities of top 1,000 raters", "Get cosine similarities of top 5,000 raters" ))
+option = st.sidebar.selectbox("Select an option", ("Books", "Book Tags", "Ratings", "Get cosine similarities of top 100 raters", "Get cosine similarities of top 1,000 raters" ))
 
 if option == "Books":
     #Show the Books dataframe
@@ -85,21 +85,21 @@ if option == "Ratings":
     #This chart will only display if expanded but it's worth it!
     
     # Add a chart to show the number of times raters have rated
-    st.title ("This chart is hidden on load, click the expand button ->")
-    chart_data = ratings['user_id'].value_counts().reset_index()
-    chart_data.columns = ['user_id', 'rating_count']
-    bars = alt.Chart(chart_data).mark_bar().encode(
-        x='rating_count',
-        y=alt.Y('user_id:O', sort='-x'),
-        tooltip=['user_id', 'rating_count']
-    ).properties(
-        title='Number of Times Raters Have Rated'
-    )
-    st.altair_chart(bars, use_container_width=True)
+    #st.title ("This chart is hidden on load, click the expand button ->")
+    #chart_data = ratings['user_id'].value_counts().reset_index()
+    #chart_data.columns = ['user_id', 'rating_count']
+    #bars = alt.Chart(chart_data).mark_bar().encode(
+    #    x='rating_count',
+    #    y=alt.Y('user_id:O', sort='-x'),
+    #    tooltip=['user_id', 'rating_count']
+    #).properties(
+    #    title='Number of Times Raters Have Rated'
+    #)
+    #st.altair_chart(bars, use_container_width=True)
     
     #Show the ratings dataframe
-    st.header("Ratings Data")
-    st.dataframe(ratings)  
+    #st.header("Ratings Data")
+    #st.dataframe(ratings)  
     
     # Add a button to generate cosine similarities for 100 top raters
 if option == "Get cosine similarities of top 100 raters":
