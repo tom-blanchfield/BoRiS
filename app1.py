@@ -107,7 +107,7 @@ else:
         recommended_books = []
         recommended_ids = []
         for book_id in top_rated_books.index:
-            if len(recommended_books) >= 20:
+            if len(recommended_books) >= 40:
                 break
             title = books.loc[books['book_id'] == book_id, 'title'].values[0]
             authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
