@@ -116,10 +116,28 @@ else:
                     recommended_books.append((title, authors))
                     recommended_ids.append(book_id)
                     
-        # Display recommended books
+       # Display recommended books
         if len(recommended_books) == 0:
             st.write("No book recommendations found.")
         else:
             st.write("Recommended books:")
             for book in recommended_books:
-                st.write("- {} by {}".format(book[0], book[1]))
+                title = book[0]
+                authors = book[1]
+                st.write("- {} by {}".format(title, authors))
+
+                # Get the book ID and image URL
+                book_id = books.loc[books['title'] == title, 'book_id'].values[0]
+                image_url = books.loc[books['title'] == title, 'image_url'].values[0]
+
+                # Download the image from the URL
+                try:
+                    response = requests.get(image_url, stream=True)
+                    response.raise_for_status()
+                    image = Image.open(response.raw)
+
+                    # Display the image with the title
+                    st.image(image, caption=title, use_column_width=False, width=200)
+                except (requests.HTTPError, OSError) as e:
+                    st.write(f"Error loading image: {e}")
+
