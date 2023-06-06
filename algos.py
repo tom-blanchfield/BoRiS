@@ -12,6 +12,14 @@ import altair as alt
 # Load the data
 ratings = pd.read_csv('ratings.csv')
 
+# Ensure the ratings DataFrame has the required columns
+required_columns = ['user_id', 'book_id', 'rating']
+missing_columns = [col for col in required_columns if col not in ratings.columns]
+
+if missing_columns:
+    st.error(f"The ratings DataFrame is missing the following required columns: {', '.join(missing_columns)}")
+    st.stop()
+
 # Calculate the number of ratings per user
 user_ratings_count = ratings['user_id'].value_counts()
 
@@ -108,3 +116,9 @@ train_set, test_set = train_test_split(ratings, test_size=test_size, random_stat
 similarity_scores = {}
 if algorithm != "":
     similarity_scores[algorithm] = calculate_similarity(algorithm)
+
+
+
+
+
+Regenerate response
