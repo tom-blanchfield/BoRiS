@@ -98,6 +98,7 @@ def calculate_similarity(algorithm):
         st.text(f"Non-Zero Matrix Factorization Similarities calculation complete.\nSimilarity Score: {similarity_score:.4f}")
         st.text("Non-Zero Matrix Factorization calculates the similarity between users based on a \nmatrix factorization approach.\nHigher scores indicate more similar users.")
 
+
 # Streamlit app
 st.title("Recommender Algorithm Evaluator")
 st.sidebar.title("Options")
@@ -116,9 +117,3 @@ train_set, test_set = train_test_split(ratings, test_size=test_size, random_stat
 similarity_scores = {}
 if algorithm != "":
     similarity_scores[algorithm] = calculate_similarity(algorithm)
-
-
-
-
-
-Regenerate response
