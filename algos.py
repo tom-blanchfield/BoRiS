@@ -3,7 +3,6 @@ import numpy as np
 import sklearn as sk
 from sklearn.metrics.pairwise import cosine_similarity, pairwise_distances
 from sklearn.decomposition import NMF
-from scipy.spatial.distance import jaccard, euclidean
 from surprise import SVD, KNNBasic, Dataset, Reader
 from surprise.model_selection import train_test_split, cross_validate
 import streamlit as st
@@ -110,8 +109,12 @@ algorithm = st.sidebar.selectbox("Select Algorithm", ['Cosine Similarity', 'Adju
 # Increase the test size to 0.2 for all algorithms
 test_size = 0.2
 
+# Convert pandas DataFrame to Surprise Dataset
+reader = Reader(rating_scale=(1, 5))
+data = Dataset.load_from_df(ratings, reader)
+
 # Split the data into train and test sets
-train_set, test_set = train_test_split(ratings, test_size=test_size, random_state=42)
+train_set, test_set = train_test_split(data, test_size=test_size, random_state=42)
 
 # Calculate similarity scores only if the algorithm is selected
 similarity_scores = {}
