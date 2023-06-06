@@ -6,5 +6,6 @@ requests
 altair
 seaborn
 matplotlib
+surprise
 streamlit==1.6
 
