@@ -90,7 +90,6 @@ def calculate_similarity(algorithm):
         st.text(f"Non-Zero Matrix Factorization Similarities calculation complete.\nSimilarity Score: {similarity_score:.4f}")
         st.text("Non-Zero Matrix Factorization calculates the similarity between users based on a \nmatrix factorization approach.\nHigher scores indicate more similar users.")
 
-
 # Streamlit app
 st.title("Recommender Algorithm Evaluator")
 st.sidebar.title("Options")
@@ -99,9 +98,13 @@ st.sidebar.title("Options")
 algorithm = st.sidebar.selectbox("Select Algorithm", ['Cosine Similarity', 'Adjusted Cosine Similarity', 'Jaccard', 'Euclidean Distance',
                                                       'Non-Zero Matrix Factorization'])
 
-# Calculate similarity scores
-similarity_scores = {}
+# Increase the test size to 0.2 for all algorithms
+test_size = 0.2
 
-# Calculate similarity only if the algorithm is selected
+# Split the data into train and test sets
+train_set, test_set = train_test_split(ratings, test_size=test_size, random_state=42)
+
+# Calculate similarity scores only if the algorithm is selected
+similarity_scores = {}
 if algorithm != "":
     similarity_scores[algorithm] = calculate_similarity(algorithm)
