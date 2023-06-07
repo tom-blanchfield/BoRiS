@@ -82,7 +82,7 @@ else:
 
         count += 1
         
-           if st.button("Get Recommendations!"):
+        if st.button("Get Recommendations!"):
         # Get the ratings of the top 5,000 raters
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
