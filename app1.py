@@ -4,6 +4,7 @@ import sklearn as sk
 from sklearn.metrics.pairwise import cosine_similarity
 import requests
 import streamlit as st
+import uuid
 from PIL import Image
 
 # Load the data
@@ -74,7 +75,7 @@ else:
             st.write(f"Error loading image: {e}")
 
         # Ask the user to rate the book
-        key = f"rating_input_{book_id}"
+        key = f"rating_input_{book_id}_{uuid.uuid4()}"
         rating_input = columns[count % 3].number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=key)
 
         # Store the user's rating in the DataFrame
