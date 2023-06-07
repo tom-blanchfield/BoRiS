@@ -55,7 +55,7 @@ else:
     columns = st.columns(3)
     count = 0
 
-    for title, count in grouped_data[:40].items():
+    for title, count in grouped_data[:9].items():
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         image_url = books.loc[books['title'] == title, 'image_url'].values[0]
