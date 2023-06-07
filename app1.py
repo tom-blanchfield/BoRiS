@@ -50,6 +50,11 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
+    # Create three columns for book ratings
+    col1, col2, col3 = st.beta_columns(3)
+    columns = [col1, col2, col3]
+    count = 0
+
     for title, count in grouped_data[:40].items():
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
@@ -60,20 +65,24 @@ else:
             response = requests.get(image_url, stream=True)
             response.raise_for_status()
             image = Image.open(response.raw)
-            
+
             # Adjust the image size
-            st.image(image, use_column_width=False, width=200)
+            image = image.resize((200, 300))
+
+            # Display the image with the title
+            columns[count % 3].image(image, caption=title, use_column_width=False, width=200)
         except (requests.HTTPError, OSError) as e:
             st.write(f"Error loading image: {e}")
-            
+
         # Ask the user to rate the book
-        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
+        rating_input = columns[count % 3].number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
 
         # Store the user's rating in the DataFrame
         user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
 
+        count += 1
         
-    if st.button("Get Recommendations!"):
+           if st.button("Get Recommendations!"):
         # Get the ratings of the top 5,000 raters
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
@@ -137,7 +146,6 @@ else:
                     image = Image.open(response.raw)
 
                     # Display the image with the title
-                    st.image(image, caption=title, use_column_width=False, width=200)
+                    st.image(image, caption=title, use_column_width=False, width=200, align=center)
                 except (requests.HTTPError, OSError) as e:
                     st.write(f"Error loading image: {e}")
-
