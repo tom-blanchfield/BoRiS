@@ -58,9 +58,11 @@ else:
         book_row = grouped_data[i:i+num_books_per_row]  # Get books for the current row
         
         # Create a container to hold the book covers
-        cover_container = st.container()
+        cover_container = st.beta_container()
 
-        for title, count in book_row.items():
+        columns = st.beta_columns(num_books_per_row)
+        
+        for idx, (title, count) in enumerate(book_row.items()):
             # Get the book ID and image URL
             book_id = books.loc[books['title'] == title, 'book_id'].values[0]
             image_url = books.loc[books['title'] == title, 'image_url'].values[0]
@@ -72,9 +74,7 @@ else:
                 image = Image.open(response.raw)
 
                 # Adjust the image size and display it in the container
-                with cover_container:
-                    col = st.column()
-                    col.image(image, caption=title, use_column_width=False, width=200)
+                columns[idx].image(image, caption=title, use_column_width=False, width=200)
 
             except (requests.HTTPError, OSError) as e:
                 st.write(f"Error loading image: {e}")
