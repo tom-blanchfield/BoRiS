@@ -126,34 +126,32 @@ else:
                     recommended_books.append((title, authors))
                     recommended_ids.append(book_id)
 
-        # Display recommended books
-        if len(recommended_ids) == 0:
-            st.write("No book recommendations found.")
-        else:
-            st.write("Recommended books:")
-            columns = st.columns(3)  # Create three columns for book recommendations
-            count = 0
-            recommended_books = []  # Define an empty list for recommended books
+if len(recommended_ids) == 0:
+    st.write("No book recommendations found.")
+else:
+    st.write("Recommended books:")
+    columns = st.columns(3)  # Create three columns for book recommendations
+    count = 0
 
-            for book_id in recommended_ids:
-                title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-                authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
-                image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
+    for book_id in recommended_ids:
+        title = books.loc[books['book_id'] == book_id, 'title'].values[0]
+        authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
+        image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
-                # Download the image from the URL
-                try:
-                    response = requests.get(image_url, stream=True)
-                    response.raise_for_status()
-                    image = Image.open(response.raw)
+        # Download the image from the URL
+        try:
+            response = requests.get(image_url, stream=True)
+            response.raise_for_status()
+            image = Image.open(response.raw)
 
-                    # Adjust the image size
-                    image = image.resize((200, 300))
+            # Adjust the image size
+            image = image.resize((200, 300))
 
-                    # Display the image with the title
-                    columns[count % 3].image(image, use_column_width=False, width=200)
-                    columns[count % 3].write(f"Title: {title}")
-                    columns[count % 3].write(f"Authors: {authors}")
+            # Display the image with the title
+            columns[count % 3].image(image, use_column_width=False, width=200)
+            columns[count % 3].write(f"Title: {title}")
+            columns[count % 3].write(f"Authors: {authors}")
 
-                    count += 1
-                except (requests.HTTPError, OSError) as e:
-                    st.write(f"Error loading image: {e}")
+            count += 1
+        except (requests.HTTPError, OSError) as e:
+            st.write(f"Error loading image: {e}")
