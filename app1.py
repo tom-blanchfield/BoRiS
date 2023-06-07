@@ -51,8 +51,7 @@ if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
     # Create three columns for book ratings
-    col1, col2, col3 = st.beta_columns(3)
-    columns = [col1, col2, col3]
+    columns = st.columns(3)
     count = 0
 
     for title, count in grouped_data[:40].items():
