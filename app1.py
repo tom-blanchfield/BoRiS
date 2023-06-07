@@ -58,7 +58,7 @@ else:
         book_row = grouped_data[i:i+num_books_per_row]  # Get books for the current row
         
         # Create a container to hold the book covers
-        cover_container = st.beta_container()
+        cover_container = st.container()
 
         columns = st.beta_columns(num_books_per_row)
         
@@ -81,6 +81,7 @@ else:
         
         # Add some spacing between rows
         st.write("\n")
+
 
         # Ask the user to rate the book
         key = f"rating_input_{book_id}_{uuid.uuid4()}"
