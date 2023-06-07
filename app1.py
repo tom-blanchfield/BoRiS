@@ -125,6 +125,7 @@ else:
                 if title not in recommended_books:
                     recommended_books.append((title, authors))
                     recommended_ids.append(book_id)
+                    st.write(f"Recommended book ID: {book_id}")
 
         # Display recommended books
         if len(recommended_ids) == 0:
@@ -133,11 +134,9 @@ else:
             st.write("Recommended books:")
             columns = st.columns(3)  # Create three columns for book recommendations
             count = 0
-            recommended_books = []  # Define an empty list for recommended books
 
             for book_id in recommended_ids:
                 title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-                authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
                 image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
                 # Download the image from the URL
@@ -151,12 +150,9 @@ else:
 
                     # Display the image with the title
                     columns[count % 3].image(image, use_column_width=False, width=200)
+                    columns[count % 3].write(title)
+
                 except (requests.HTTPError, OSError) as e:
                     st.write(f"Error loading image: {e}")
 
-                # Append the book to the recommended books list
-                recommended_books.append((title, authors))
                 count += 1
-
-# Save the ratings
-user_ratings.to_csv('user_ratings.csv', index=False)
