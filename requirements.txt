@@ -7,5 +7,6 @@ altair
 seaborn
 matplotlib
 surprise
+uuid
 streamlit==1.6
 
