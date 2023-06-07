@@ -57,7 +57,7 @@ else:
     for i in range(0, num_books, num_books_per_row):
         book_row = grouped_data[i:i+num_books_per_row]  # Get books for the current row
         
-        columns = st.beta_columns(num_books_per_row)
+        columns = st.columns(num_books_per_row)
         
         for idx, (title, count) in enumerate(book_row.items()):
             # Get the book ID and image URL
