@@ -70,7 +70,7 @@ else:
             image = image.resize((200, 300))
 
             # Display the image with the title
-            columns[count % 3].image(image, caption=title, use_column_width=False, width=200)
+            columns[count % 3].image(image, caption=none, use_column_width=False, width=200)
         except (requests.HTTPError, OSError) as e:
             st.write(f"Error loading image: {e}")
 
