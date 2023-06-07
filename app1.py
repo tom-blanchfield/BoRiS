@@ -141,4 +141,3 @@ else:
 
                 # Get the book ID and image URL
                 book_id = books.loc[books['title']
-
