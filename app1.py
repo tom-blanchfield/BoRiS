@@ -140,4 +140,22 @@ else:
                 st.write("- {} by {}".format(title, authors))
 
                 # Get the book ID and image URL
-                book_id = books.loc[books['title']
+                book_id = books.loc[books['title'] == title, 'book_id'].values[0]
+                image_url = books.loc[books['title'] == title, 'image_url'].values[0]
+
+                # Download the image from the URL
+                try:
+                    response = requests.get(image_url, stream=True)
+                    response.raise_for_status()
+                    image = Image.open(response.raw)
+
+                    # Adjust the image size
+                    image = image.resize((200, 300))
+
+                    # Display the image with the title
+                    columns[count % 3].image(image, use_column_width=False, width=200)
+                except (requests.HTTPError, OSError) as e:
+                    st.write(f"Error loading image: {e}")
+
+                count += 1
+
