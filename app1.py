@@ -51,28 +51,36 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    # Create three columns for book ratings
-    columns = st.columns(3)
-    count = 0
+    num_books_per_row = 3  # Number of books to display in each row
+    num_books = 40  # Total number of books to display
+    
+    for i in range(0, num_books, num_books_per_row):
+        book_row = grouped_data[i:i+num_books_per_row]  # Get books for the current row
+        
+        # Create a container to hold the book covers
+        cover_container = st.container()
 
-    for title, count in grouped_data[:40].items():
-        # Get the book ID and image URL
-        book_id = books.loc[books['title'] == title, 'book_id'].values[0]
-        image_url = books.loc[books['title'] == title, 'image_url'].values[0]
+        for title, count in book_row.items():
+            # Get the book ID and image URL
+            book_id = books.loc[books['title'] == title, 'book_id'].values[0]
+            image_url = books.loc[books['title'] == title, 'image_url'].values[0]
 
-        # Download the image from the URL
-        try:
-            response = requests.get(image_url, stream=True)
-            response.raise_for_status()
-            image = Image.open(response.raw)
+            # Download the image from the URL
+            try:
+                response = requests.get(image_url, stream=True)
+                response.raise_for_status()
+                image = Image.open(response.raw)
 
-            # Adjust the image size
-            image = image.resize((200, 300))
+                # Adjust the image size and display it in the container
+                with cover_container:
+                    col = st.column()
+                    col.image(image, caption=title, use_column_width=False, width=200)
 
-            # Display the image with the title
-            columns[count % 3].image(image, caption=title, use_column_width=False, width=200)
-        except (requests.HTTPError, OSError) as e:
-            st.write(f"Error loading image: {e}")
+            except (requests.HTTPError, OSError) as e:
+                st.write(f"Error loading image: {e}")
+        
+        # Add some spacing between rows
+        st.write("\n")
 
         # Ask the user to rate the book
         key = f"rating_input_{book_id}_{uuid.uuid4()}"
