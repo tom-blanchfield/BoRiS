@@ -40,6 +40,7 @@ grouped_data = filtered_data.groupby('title')['count'].sum().sort_values(ascendi
 # Get top 5,000 raters
 ratings_count = ratings.groupby('user_id').size().reset_index(name='count').sort_values('count', ascending=False)
 top_raters = ratings_count[:5000]['user_id'].tolist()
+
 # Create a list to store user ratings
 user_ratings_list = []
 
