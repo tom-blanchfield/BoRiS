@@ -3,9 +3,6 @@ import numpy as np
 import sklearn as sk
 from sklearn.metrics.pairwise import cosine_similarity
 import streamlit as st
-import requests
-import uuid
-from PIL import Image
 
 # Load the data
 books = pd.read_csv('books.csv')
@@ -50,57 +47,59 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    # Create three columns for book ratings
-    columns = st.columns(3)
-    count = 0
-
-    for title, count in grouped_data[:9].items():
-        # Get the book ID and image URL
+    for title, count in grouped_data[:30].items():
+        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
-        image_url = books.loc[books['title'] == title, 'image_url'].values[0]
-        # Download the image from the URL
-        try:
-            response = requests.get(image_url, stream=True)
-            response.raise_for_status()
-            image = Image.open(response.raw)
+        user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input}, ignore_index=True)
+        
+    if st.button("Get Recommendations!"):
+        # Get the ratings of the top 10,000 raters
+        top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
+        top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
-            # Adjust the image size
-            image = image.resize((200, 300))
+        # Add the user's ratings to the DataFrame
+        user_ratings_df = pd.DataFrame(user_ratings)
+        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
+        user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
 
-            # Display the image with the title
-            columns[count % 3].image(image, use_column_width=False, width=200)
-        except (requests.HTTPError, OSError) as e:
-            st.write(f"Error downloading image for book: {title}")
+        # Replace missing values with median
+        user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
 
-    # Get user rating for the book
-    rating = st.selectbox(f"Rate the book '{title}'", options=[0, 1, 2, 3, 4, 5])
+        # Get ratings of top 10,000 raters
+        top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)].pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
-    # Add the rating to the user_ratings DataFrame
-    user_ratings = user_ratings.append(pd.Series({'book_id': book_id, 'user_id': 'user1', 'rating': rating}), ignore_index=True)
+        # Merge user's ratings with top raters ratings
+        merged_ratings = pd.concat([user_ratings_pivot, top_raters_ratings])
 
+        # Calculate cosine similarities between the user and top raters
+        user_similarities = cosine_similarity(merged_ratings)[0]
 
-# Generate recommendations based on user ratings
-st.title("Recommended Books:")
+        # Get the indices of the 10 closest users and their ratings
+        closest_user_indices = user_similarities.argsort()[-11:-1]
+        closest_user_ratings = merged_ratings.iloc[closest_user_indices]
 
-# Calculate book similarities using cosine similarity
-book_matrix = pd.pivot_table(ratings[ratings['user_id'].isin(top_raters)], values='rating', index='user_id', columns='book_id', fill_value=0)
-similarity_matrix = cosine_similarity(book_matrix.T)
+        # Get top rated books of the 10 closest users and sort
+        top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
+        
+        # Get recommended books, excluding those containing Potter
+        user_rated_books = user_ratings_df['book_id'].tolist()
+        recommended_books = []
+        recommended_ids = []
+        for book_id in top_rated_books.index:
+            if len(recommended_books) >= 100:
+                break
+            title = books.loc[books['book_id'] == book_id, 'title'].values[0]
+            authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
+            if 'Potter' not in title and book_id not in user_rated_books:
+                if title not in recommended_books:
+                    recommended_books.append((title, authors))
+                    recommended_ids.append(book_id)
+                    
+        # Display recommended books
+        if len(recommended_books) == 0:
+            st.write("No book recommendations found.")
+        else:
+            st.write("Recommended books:")
+            for book in recommended_books:
+                st.write("- {} by {}".format(book[0], book[1]))
 
-# Get the user ratings for the rated books
-user_ratings_matrix = pd.pivot_table(user_ratings, values='rating', index='user_id', columns='book_id', fill_value=0)
-
-# Calculate the weighted average of similarities and user ratings
-weighted_avg = np.dot(similarity_matrix, user_ratings_matrix.values.T) / np.abs(similarity_matrix).sum(axis=1).reshape(-1, 1)
-
-# Get the recommended book IDs
-book_ids = np.argsort(weighted_avg)[-10:][::-1]
-
-# Display the recommended books
-for book_id in book_ids:
-    book_title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-    book_author = books.loc[books['book_id'] == book_id, 'authors'].values[0]
-    book_image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
-
-    st.write(f"**Title:** {book_title}")
-    st.write(f"**Author:** {book_author}")
-    st.image(book_image_url, use_column_width=False, width=200)
