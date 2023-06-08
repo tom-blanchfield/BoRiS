@@ -40,9 +40,8 @@ grouped_data = filtered_data.groupby('title')['count'].sum().sort_values(ascendi
 # Get top 5,000 raters
 ratings_count = ratings.groupby('user_id').size().reset_index(name='count').sort_values('count', ascending=False)
 top_raters = ratings_count[:5000]['user_id'].tolist()
-
-# Create a DataFrame to store user ratings
-user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
+# Create a list to store user ratings
+user_ratings_list = []
 
 # Display books to rate
 st.title("Please rate these books:")
@@ -52,9 +51,11 @@ else:
     for title, count in grouped_data[:10].items():
         rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
-        user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input}, ignore_index=True)
+        user_ratings_list.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input})
 
     if st.button("Get Recommendations!"):
+        # Convert the list of user ratings to a DataFrame
+        user_ratings_df = pd.DataFrame(user_ratings_list)
         # Get the ratings of the top 5,000 raters
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
