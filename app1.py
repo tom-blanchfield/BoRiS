@@ -1,7 +1,10 @@
 import pandas as pd
 import numpy as np
-import sklearn.metrics.pairwise as pw
+import sklearn as sk
+from sklearn.metrics.pairwise import cosine_similarity
 import streamlit as st
+from PIL import Image
+import requests
 
 # Load the data
 books = pd.read_csv('books.csv')
@@ -17,114 +20,116 @@ book_data = pd.merge(book_data, tags, on='tag_id')
 tags_df = book_data.groupby('tag_name').size().reset_index(name='counts').sort_values('counts', ascending=False).head(1000)
 
 # Tags to include in the "genres" multi-select dropdown
-tags_to_include = ['young-adult', 'literature', 'romance', 'mystery', 'science-fiction', 'fantasy', 'horror', 'thriller', 'western', 'dystopian', 'memoir', 'biography', 'autobiography', 'history', 'travel', 'cookbook', 'self-help', 'business', 'finance', 'psychology', 'philosophy', 'religion', 'art', 'music', 'comics', 'graphic novels', 'poetry', 'sport', 'humorous', 'war', 'funny']
-
-# Extract unique authors
-unique_authors = books['authors'].unique()
+tags_to_include = ['literature', 'comedy', 'young-adult', 'romance', 'mystery', 'science-fiction', 'fantasy', 'horror', 'thriller', 'western', 'dystopian', 'memoir', 'biography', 'autobiography', 'history', 'travel', 'cookbook', 'self-help', 'business', 'finance', 'psychology', 'philosophy', 'religion', 'art', 'music', 'comics', 'graphic novels', 'poetry', 'sport', 'humorous', 'war', 'funny']
 
 # Title
 st.sidebar.title("Please choose your favourite authors and/or genres")
 
 # Allow the user to select multiple authors
-selected_authors = st.sidebar.multiselect("Select authors", unique_authors)
+selected_authors = st.sidebar.multiselect("Select authors", list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
 
 # Allow the user to select multiple genres
 selected_tags = st.sidebar.multiselect("Select genres", tags_to_include)
 
-# Modify the filtered data based on the selected authors
-filtered_data = book_data[book_data['authors'].isin(selected_authors) | book_data['tag_name'].isin(selected_tags)]
+# Modify the filtered data based on the selected authors and genres
+filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors) | book_data['tag_name'].isin(selected_tags)]
 
 # Group by book and sort by count
 grouped_data = filtered_data.groupby('title')['count'].sum().sort_values(ascending=False)
 
-# Get top 5,000 raters
+# Get top 10,000 raters
 ratings_count = ratings.groupby('user_id').size().reset_index(name='count').sort_values('count', ascending=False)
-top_raters = ratings_count[:5000]['user_id'].tolist()
+top_raters = ratings_count[:1000]['user_id'].tolist()
 
-# Create a list to store user ratings
-user_ratings_list = []
+# Create a DataFrame to store user ratings
+user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
 
 # Display books to rate
 st.title("Please rate these books:")
+
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    for title, count in grouped_data[:10].items():
-        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
+    # Arrange books into 3 columns
+    columns = st.columns(3)
+    column_idx = 0
+
+    for title, count in grouped_data[:50].items():
+        # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
-        user_ratings_list.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input})
+        image_url = books.loc[books['title'] == title, 'image_url'].values[0]
+                    # Download the image from the URL
+            try:
+                response = requests.get(image_url, stream=True)
+                response.raise_for_status()
+                image = Image.open(response.raw)
+                
+                # Adjust the image size
+                resized_image = image.resize((200, 300))
+                
+                # Show the resized image in the current column
+                columns[column_idx].image(resized_image, caption=title, use_column_width=True)
+                
+                # Move to the next column
+                column_idx = (column_idx + 1) % 3
+            except (requests.HTTPError, OSError) as e:
+                st.write(f"Error loading image: {e}")
+                
+            # Ask the user to rate the book
+            rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
 
-    if st.button("Get Recommendations!"):
-        # Convert the list of user ratings to a DataFrame
-        user_ratings_df = pd.DataFrame(user_ratings_list)
-        # Get the ratings of the top 5,000 raters
-        top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
-        top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
+            # Store the user's rating in the DataFrame
+            user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
 
-        # Add the user's ratings to the DataFrame
-        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
-        user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
+        if st.button("Get Recommendations!"):
+            # Get the ratings of the top 10,000 raters
+            top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
+            top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
-        # Replace missing values with median
-        user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
+            # Add the user's ratings to the DataFrame
+            user_ratings_df = pd.DataFrame(user_ratings)
+            user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
+            user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
 
-        # Calculate similarity scores using cosine similarity
-        user_similarities = pw.cosine_similarity(user_ratings_pivot, dense_output=False)[0]
+            # Replace missing values with the median
+            user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
 
+            # Get ratings of top 10,000 raters
+            top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)].pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
-        # Get the indices of the 10 closest users and their ratings
-        closest_user_indices = user_similarities.argsort()[-11:-1]
-        closest_user_ratings = top_raters_ratings.iloc[closest_user_indices]
+            # Merge user's ratings with top raters ratings
+            merged_ratings = pd.concat([user_ratings_pivot, top_raters_ratings])
 
-        # Get top rated books of the 10 closest users and sort
-        top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
+            # Calculate cosine similarities between the user and top raters
+            user_similarities = cosine_similarity(merged_ratings)[0]
 
-        # Get recommended books, excluding those containing Potter
-        user_rated_books = user_ratings_df['book_id'].tolist()
-        recommended_books = []
-        recommended_ids = []
+            # Get the indices of the 10 closest users and their ratings
+            closest_user_indices = user_similarities.argsort()[-11:-1]
+            closest_user_ratings = merged_ratings.iloc[closest_user_indices]
 
-        for book_id in top_rated_books.index:
-            if len(recommended_books) >= 100:
-                break
-            title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-            authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
-            if 'Potter' not in title and book_id not in user_rated_books:
-                if title not in recommended_books:
-                    recommended_books.append((title, authors))
-                    recommended_ids.append(book_id)
+            # Get the top-rated books of the 10 closest users and sort
+            top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
+            
+            # Get recommended books, excluding those containing "Potter"
+            user_rated_books = user_ratings_df['book_id'].tolist()
+            recommended_books = []
+            recommended_ids = []
+            for book_id in top_rated_books.index:
+                if len(recommended_books) >= 100:
+                    break
+                title = books.loc[books['book_id'] == book_id, 'title'].values[0]
+                authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
+                if 'Potter' not in title and book_id not in user_rated_books:
+                    if title not in recommended_books:
+                        recommended_books.append((title, authors))
+                        recommended_ids.append(book_id)
+                        
+            # Display recommended books
+            if len(recommended_books) == 0:
+                st.write("No book recommendations found.")
+            else:
+                st.write("Recommended books:")
+                for book in recommended_books:
+                    st.write("- {} by {}".format(book[0], book[1]))
 
-        if len(recommended_books) == 0:
-            st.write("No book recommendations found for adjusted cosine similarity.")
-        else:
-            st.write("Recommended books (Adjusted cosine similarity):")
-            for book in recommended_books:
-                st.write("- {} by {}".format(book[0], book[1]))
-
-        closest_user_ratings = user_ratings_pivot.iloc[closest_user_indices]
-
-        # Get top rated books of the 10 closest users and sort
-        top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
-
-        # Get recommended books, excluding those containing Potter
-        user_rated_books = user_ratings_df['book_id'].tolist()
-        recommended_books = []
-        recommended_ids = []
-
-        for book_id in top_rated_books.index:
-            if len(recommended_books) >= 100:
-                break
-            title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-            authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
-            if 'Potter' not in title and book_id not in user_rated_books:
-                if title not in recommended_books:
-                    recommended_books.append((title, authors))
-                    recommended_ids.append(book_id)
-
-        if len(recommended_books) == 0:
-            st.write("No book recommendations found for cosine similarity.")
-        else:
-            st.write("Recommended books (Cosine similarity):")
-            for book in recommended_books:
-                st.write("- {} by {}".format(book[0], book[1]))
 
