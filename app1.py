@@ -67,11 +67,10 @@ else:
 
             # Display the book cover image
             with columns[column_idx % 3]:
-                st.image(resized_image, use_column_width=True)
-                st.write(f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}")
+                st.image(resized_image, caption=f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}", use_column_width=True)
 
                 # Ask the user to rate the book
-                rating_input = st.number_input(min_value=1, max_value=5, key=title)
+                rating_input = st.number_input(label="Rate the book:", min_value=1, max_value=5, key=title)
 
                 # Store the user's rating in the DataFrame
                 user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
@@ -116,7 +115,7 @@ if st.button("Get Recommendations!"):
         if len(recommended_books) >= 100:
             break
         title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-        author = books.loc[books['book_id'] == book_id, 'author'].values[0]
+        author = books.loc[books['book_id'] == book_id, 'authors'].values[0]
         if 'Potter' not in title and book_id not in user_rated_books:
             if title not in recommended_books:
                 recommended_books.append((title, author))
