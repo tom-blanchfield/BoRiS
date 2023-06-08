@@ -62,7 +62,7 @@ else:
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
         # Add the user's ratings to the DataFrame
-        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id')
+        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
         user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
 
         # Replace missing values with median
@@ -70,6 +70,7 @@ else:
 
         # Calculate similarity scores using cosine similarity
         user_similarities = pw.cosine_similarity(user_ratings_pivot, dense_output=False)[0]
+
 
         # Get the indices of the 10 closest users and their ratings
         closest_user_indices = user_similarities.argsort()[-11:-1]
