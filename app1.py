@@ -50,10 +50,6 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    # Arrange books into 3 columns
-    columns = st.columns(3)
-    column_idx = 0
-
     for title, count in grouped_data[:50].items():
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
@@ -68,17 +64,16 @@ else:
             # Adjust the image size
             resized_image = image.resize((200, 300))
 
-            # Show the resized image in the current column
-            columns[column_idx].image(resized_image, caption=title, use_column_width=True)
+            # Create a nested layout for each book
+            col1, col2 = st.beta_columns(2)
+            with col1:
+                st.image(resized_image, use_column_width=True)
+            with col2:
+                # Ask the user to rate the book
+                rating_input = st.number_input("Rate the book:", min_value=1, max_value=5, key=title)
 
-            # Move to the next column
-            column_idx = (column_idx + 1) % 3
-
-            # Ask the user to rate the book
-            rating_input = st.number_input("", min_value=1, max_value=5, key=title)
-
-            # Store the user's rating in the DataFrame
-            user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
+                # Store the user's rating in the DataFrame
+                user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
 
         except (requests.HTTPError, OSError) as e:
             st.write(f"Error loading image: {e}")
