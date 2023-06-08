@@ -58,7 +58,8 @@ else:
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         image_url = books.loc[books['title'] == title, 'image_url'].values[0]
-                    # Download the image from the URL
+
+        # Download the image from the URL
         try:
             response = requests.get(image_url, stream=True)
             response.raise_for_status()
@@ -68,18 +69,19 @@ else:
             resized_image = image.resize((200, 300))
 
             # Show the resized image in the current column
-            columns[column_idx].image(resized_image, caption=title, use_column_width=True)
+            columns[column_idx].image(resized_image, caption=f"{title} by {authors}", use_column_width=True)
 
             # Move to the next column
             column_idx = (column_idx + 1) % 3
+
+            # Ask the user to rate the book
+            rating_input = st.number_input("", min_value=1, max_value=5, key=title)
+
+            # Store the user's rating in the DataFrame
+            user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
+
         except (requests.HTTPError, OSError) as e:
             st.write(f"Error loading image: {e}")
-
-        # Ask the user to rate the book
-        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
-
-        # Store the user's rating in the DataFrame
-        user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
 
     if st.button("Get Recommendations!"):
         # Get the ratings of the top 10,000 raters
@@ -131,5 +133,3 @@ else:
             st.write("Recommended books:")
             for book in recommended_books:
                 st.write("- {} by {}".format(book[0], book[1]))
-
-
