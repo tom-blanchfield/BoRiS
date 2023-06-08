@@ -70,7 +70,7 @@ else:
                 st.image(resized_image, caption=f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}", use_column_width=True)
 
                 # Ask the user to rate the book
-                rating_input = st.number_input(label="Rate the book:", min_value=1, max_value=5, key=title)
+                rating_input = st.number_input(label="", min_value=1, max_value=5, key=title)
 
                 # Store the user's rating in the DataFrame
                 user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
