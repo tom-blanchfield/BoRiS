@@ -61,8 +61,8 @@ else:
 
         # Add the user's ratings to the DataFrame
         user_ratings_df = pd.DataFrame(user_ratings)
-        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
-        user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
+        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id)
+                                                           user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
 
         # Replace missing values with median
         user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
@@ -72,7 +72,7 @@ else:
 
         # Get the indices of the 10 closest users and their ratings
         closest_user_indices = user_similarities.argsort()[-11:-1]
-        closest_user_ratings = merged_ratings.iloc[closest_user_indices]
+        closest_user_ratings = top_raters_ratings.iloc[closest_user_indices]
 
         # Get top rated books of the 10 closest users and sort
         top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
@@ -125,3 +125,4 @@ else:
             st.write("Recommended books (Cosine similarity):")
             for book in recommended_books:
                 st.write("- {} by {}".format(book[0], book[1]))
+
