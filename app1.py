@@ -21,15 +21,15 @@ tags_df = book_data.groupby('tag_name').size().reset_index(name='counts').sort_v
 tags_to_include = ['young-adult', 'literature', 'romance', 'mystery', 'science-fiction', 'fantasy', 'horror', 'thriller', 'western', 'dystopian', 'memoir', 'biography', 'autobiography', 'history', 'travel', 'cookbook', 'self-help', 'business', 'finance', 'psychology', 'philosophy', 'religion', 'art', 'music', 'comics', 'graphic novels', 'poetry', 'sport', 'humorous', 'war', 'funny']
 
 # Title
-st.sidebar.title("Please choose your favourite authors and/or genres")
+st.sidebar.title("Please choose your favourite authors, and or genres")
 
 # Allow the user to select multiple authors
 selected_authors = st.sidebar.multiselect("Select authors", books['authors'])
 
-# Allow the user to select multiple genres
+#Allow the user to select multiple genres
 selected_tags = st.sidebar.multiselect("Select genres", tags_to_include)
 
-# Modify the filtered data based on the selected authors and genres
+# Modify the filtered data based on the selected authors
 filtered_data = book_data[book_data['authors'].isin(selected_authors) | book_data['tag_name'].isin(selected_tags)]
 
 # Group by book and sort by count
@@ -47,11 +47,8 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    # Create three columns for book ratings
-    columns = st.columns(3)
-
     for title, count in grouped_data[:30].items():
-        rating_input = columns[count % 3].number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
+        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input}, ignore_index=True)
         
@@ -84,7 +81,7 @@ else:
         # Get top rated books of the 10 closest users and sort
         top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
         
-        # Get recommended books, excluding those containing "Potter"
+        # Get recommended books, excluding those containing Potter
         user_rated_books = user_ratings_df['book_id'].tolist()
         recommended_books = []
         recommended_ids = []
@@ -105,3 +102,4 @@ else:
             st.write("Recommended books:")
             for book in recommended_books:
                 st.write("- {} by {}".format(book[0], book[1]))
+
