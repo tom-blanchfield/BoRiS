@@ -58,48 +58,48 @@ else:
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         image_url = books.loc[books['title'] == title, 'image_url'].values[0]
-            # Download the image from the URL
-            try:
-                response = requests.get(image_url, stream=True)
-                response.raise_for_status()
-                image = Image.open(response.raw)
+        # Download the image from the URL
+        try:
+            response = requests.get(image_url, stream=True)
+            response.raise_for_status()
+            image = Image.open(response.raw)
 
-                # Adjust the image size
-                image = image.resize((200, 300))
+            # Adjust the image size
+            image = image.resize((200, 300))
 
-                # Display the image with the title
-                columns[count % 3].image(image, use_column_width=False, width=200)
-            except (requests.HTTPError, OSError) as e:
-                st.write(f"Error downloading image for book: {title}")
+            # Display the image with the title
+            columns[count % 3].image(image, use_column_width=False, width=200)
+        except (requests.HTTPError, OSError) as e:
+            st.write(f"Error downloading image for book: {title}")
 
-        # Get user rating for the book
-        rating = st.selectbox(f"Rate the book '{title}'", options=[0, 1, 2, 3, 4, 5])
+    # Get user rating for the book
+    rating = st.selectbox(f"Rate the book '{title}'", options=[0, 1, 2, 3, 4, 5])
 
-        # Add the rating to the user_ratings DataFrame
-        user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating}, ignore_index=True)
+    # Add the rating to the user_ratings DataFrame
+    user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating}, ignore_index=True)
 
-    # Generate recommendations based on user ratings
-    st.title("Recommended Books:")
+# Generate recommendations based on user ratings
+st.title("Recommended Books:")
 
-    # Calculate book similarities using cosine similarity
-    book_matrix = pd.pivot_table(ratings[ratings['user_id'].isin(top_raters)], values='rating', index='user_id', columns='book_id', fill_value=0)
-    similarity_matrix = cosine_similarity(book_matrix.T)
+# Calculate book similarities using cosine similarity
+book_matrix = pd.pivot_table(ratings[ratings['user_id'].isin(top_raters)], values='rating', index='user_id', columns='book_id', fill_value=0)
+similarity_matrix = cosine_similarity(book_matrix.T)
 
-    # Get the user ratings for the rated books
-    user_ratings_matrix = pd.pivot_table(user_ratings, values='rating', index='user_id', columns='book_id', fill_value=0)
+# Get the user ratings for the rated books
+user_ratings_matrix = pd.pivot_table(user_ratings, values='rating', index='user_id', columns='book_id', fill_value=0)
 
-    # Calculate the weighted average of similarities and user ratings
-    weighted_avg = np.dot(similarity_matrix, user_ratings_matrix.values.T) / np.abs(similarity_matrix).sum(axis=1).reshape(-1, 1)
+# Calculate the weighted average of similarities and user ratings
+weighted_avg = np.dot(similarity_matrix, user_ratings_matrix.values.T) / np.abs(similarity_matrix).sum(axis=1).reshape(-1, 1)
 
-    # Get the recommended book IDs
-    book_ids = np.argsort(weighted_avg)[-10:][::-1]
+# Get the recommended book IDs
+book_ids = np.argsort(weighted_avg)[-10:][::-1]
 
-    # Display the recommended books
-    for book_id in book_ids:
-        book_title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-        book_author = books.loc[books['book_id'] == book_id, 'authors'].values[0]
-        book_image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
+# Display the recommended books
+for book_id in book_ids:
+    book_title = books.loc[books['book_id'] == book_id, 'title'].values[0]
+    book_author = books.loc[books['book_id'] == book_id, 'authors'].values[0]
+    book_image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
-        st.write(f"**Title:** {book_title}")
-        st.write(f"**Author:** {book_author}")
-        st.image(book_image_url, use_column_width=False, width=200)
+    st.write(f"**Title:** {book_title}")
+    st.write(f"**Author:** {book_author}")
+    st.image(book_image_url, use_column_width=False, width=200)
