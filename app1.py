@@ -51,7 +51,7 @@ else:
     columns = st.columns(3)
 
     for title, count in grouped_data[:30].items():
-        rating_input = columns[count % 3].number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title, width=200)
+        rating_input = columns[count % 3].number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input}, ignore_index=True)
         
