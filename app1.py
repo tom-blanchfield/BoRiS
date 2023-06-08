@@ -50,7 +50,8 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    for title, count in grouped_data[:50].items():
+    columns = st.beta_columns(3)
+    for column_idx, (title, count) in enumerate(grouped_data[:50].items()):
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         image_url = books.loc[books['title'] == title, 'image_url'].values[0]
@@ -64,11 +65,11 @@ else:
             # Adjust the image size
             resized_image = image.resize((200, 300))
 
-            # Create a nested layout for each book
-            col1, col2 = st.beta_columns(2)
-            with col1:
+            # Display the book cover image
+            with columns[column_idx % 3]:
                 st.image(resized_image, use_column_width=True)
-            with col2:
+                st.write(f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}")
+
                 # Ask the user to rate the book
                 rating_input = st.number_input("Rate the book:", min_value=1, max_value=5, key=title)
 
