@@ -61,8 +61,8 @@ else:
 
         # Add the user's ratings to the DataFrame
         user_ratings_df = pd.DataFrame(user_ratings)
-        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id)
-                                                           user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
+        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id')
+        user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
 
         # Replace missing values with median
         user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
