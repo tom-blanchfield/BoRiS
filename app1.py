@@ -69,7 +69,7 @@ else:
             resized_image = image.resize((200, 300))
 
             # Show the resized image in the current column
-            columns[column_idx].image(resized_image, caption=f"{title} by {authors}", use_column_width=True)
+            columns[column_idx].image(resized_image, caption=title, use_column_width=True)
 
             # Move to the next column
             column_idx = (column_idx + 1) % 3
@@ -83,53 +83,53 @@ else:
         except (requests.HTTPError, OSError) as e:
             st.write(f"Error loading image: {e}")
 
-    if st.button("Get Recommendations!"):
-        # Get the ratings of the top 10,000 raters
-        top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
-        top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
+if st.button("Get Recommendations!"):
+    # Get the ratings of the top 10,000 raters
+    top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
+    top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
-        # Add the user's ratings to the DataFrame
-        user_ratings_df = pd.DataFrame(user_ratings)
-        user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
-        user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
+    # Add the user's ratings to the DataFrame
+    user_ratings_df = pd.DataFrame(user_ratings)
+    user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
+    user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
 
-        # Replace missing values with the median
-        user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
+    # Replace missing values with the median
+    user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
 
-        # Get ratings of top 10,000 raters
-        top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)].pivot(index='user_id', columns='book_id', values='rating').fillna(0)
+    # Get ratings of top 10,000 raters
+    top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)].pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
-        # Merge user's ratings with top raters ratings
-        merged_ratings = pd.concat([user_ratings_pivot, top_raters_ratings])
+    # Merge user's ratings with top raters ratings
+    merged_ratings = pd.concat([user_ratings_pivot, top_raters_ratings])
 
-        # Calculate cosine similarities between the user and top raters
-        user_similarities = cosine_similarity(merged_ratings)[0]
+    # Calculate cosine similarities between the user and top raters
+    user_similarities = cosine_similarity(merged_ratings)[0]
 
-        # Get the indices of the 10 closest users and their ratings
-        closest_user_indices = user_similarities.argsort()[-11:-1]
-        closest_user_ratings = merged_ratings.iloc[closest_user_indices]
+    # Get the indices of the 10 closest users and their ratings
+    closest_user_indices = user_similarities.argsort()[-11:-1]
+    closest_user_ratings = merged_ratings.iloc[closest_user_indices]
 
-        # Get the top-rated books of the 10 closest users and sort
-        top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
+    # Get the top-rated books of the 10 closest users and sort
+    top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
 
-        # Get recommended books, excluding those containing "Potter"
-        user_rated_books = user_ratings_df['book_id'].tolist()
-        recommended_books = []
-        recommended_ids = []
-        for book_id in top_rated_books.index:
-            if len(recommended_books) >= 100:
-                break
-            title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-            authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
-            if 'Potter' not in title and book_id not in user_rated_books:
-                if title not in recommended_books:
-                    recommended_books.append((title, authors))
-                    recommended_ids.append(book_id)
+    # Get recommended books, excluding those containing "Potter"
+    user_rated_books = user_ratings_df['book_id'].tolist()
+    recommended_books = []
+    recommended_ids = []
+    for book_id in top_rated_books.index:
+        if len(recommended_books) >= 100:
+            break
+        title = books.loc[books['book_id'] == book_id, 'title'].values[0]
+        author = books.loc[books['book_id'] == book_id, 'author'].values[0]
+        if 'Potter' not in title and book_id not in user_rated_books:
+            if title not in recommended_books:
+                recommended_books.append((title, author))
+                recommended_ids.append(book_id)
 
-        # Display recommended books
-        if len(recommended_books) == 0:
-            st.write("No book recommendations found.")
-        else:
-            st.write("Recommended books:")
-            for book in recommended_books:
-                st.write("- {} by {}".format(book[0], book[1]))
+    # Display recommended books
+    if len(recommended_books) == 0:
+        st.write("No book recommendations found.")
+    else:
+        st.write("Recommended books:")
+        for book in recommended_books:
+            st.write("- {} by {}".format(book[0], book[1]))
