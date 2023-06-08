@@ -71,7 +71,7 @@ else:
                 st.write(f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}")
 
                 # Ask the user to rate the book
-                rating_input = st.number_input("Rate the book:", min_value=1, max_value=5, key=title)
+                rating_input = st.number_input(min_value=1, max_value=5, key=title)
 
                 # Store the user's rating in the DataFrame
                 user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user1'], 'rating': [rating_input]})], ignore_index=True)
