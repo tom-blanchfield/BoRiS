@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
-import sklearn as sk
-from sklearn.metrics.pairwise import cosine_similarity
+import sklearn.metrics.pairwise as pw
 import streamlit as st
 
 # Load the data
@@ -20,13 +19,16 @@ tags_df = book_data.groupby('tag_name').size().reset_index(name='counts').sort_v
 # Tags to include in the "genres" multi-select dropdown
 tags_to_include = ['young-adult', 'literature', 'romance', 'mystery', 'science-fiction', 'fantasy', 'horror', 'thriller', 'western', 'dystopian', 'memoir', 'biography', 'autobiography', 'history', 'travel', 'cookbook', 'self-help', 'business', 'finance', 'psychology', 'philosophy', 'religion', 'art', 'music', 'comics', 'graphic novels', 'poetry', 'sport', 'humorous', 'war', 'funny']
 
+# Extract unique authors
+unique_authors = books['authors'].unique()
+
 # Title
-st.sidebar.title("Please choose your favourite authors, and or genres")
+st.sidebar.title("Please choose your favourite authors and/or genres")
 
 # Allow the user to select multiple authors
-selected_authors = st.sidebar.multiselect("Select authors", books['authors'])
+selected_authors = st.sidebar.multiselect("Select authors", unique_authors)
 
-#Allow the user to select multiple genres
+# Allow the user to select multiple genres
 selected_tags = st.sidebar.multiselect("Select genres", tags_to_include)
 
 # Modify the filtered data based on the selected authors
@@ -47,11 +49,11 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    for title, count in grouped_data[:30].items():
+    for title, count in grouped_data[:20].items():
         rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input}, ignore_index=True)
-        
+
     if st.button("Get Recommendations!"):
         # Get the ratings of the top 10,000 raters
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
@@ -71,8 +73,8 @@ else:
         # Merge user's ratings with top raters ratings
         merged_ratings = pd.concat([user_ratings_pivot, top_raters_ratings])
 
-        # Calculate cosine similarities between the user and top raters
-        user_similarities = cosine_similarity(merged_ratings)[0]
+        # Calculate similarity scores using adjusted cosine similarity
+        user_similarities = pw.cosine_similarity(merged_ratings, dense_output=False)[0]
 
         # Get the indices of the 10 closest users and their ratings
         closest_user_indices = user_similarities.argsort()[-11:-1]
@@ -85,6 +87,7 @@ else:
         user_rated_books = user_ratings_df['book_id'].tolist()
         recommended_books = []
         recommended_ids = []
+
         for book_id in top_rated_books.index:
             if len(recommended_books) >= 100:
                 break
@@ -94,12 +97,12 @@ else:
                 if title not in recommended_books:
                     recommended_books.append((title, authors))
                     recommended_ids.append(book_id)
-                    
-        # Display recommended books
+
         if len(recommended_books) == 0:
-            st.write("No book recommendations found.")
+            st.write("No book recommendations found for adjusted cosine similarity.")
         else:
-            st.write("Recommended books:")
+            st.write("Recommended books (Adjusted cosine similarity):")
             for book in recommended_books:
                 st.write("- {} by {}".format(book[0], book[1]))
+
 
