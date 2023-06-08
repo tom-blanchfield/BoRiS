@@ -49,7 +49,7 @@ st.title("Please rate these books:")
 if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
-    for title, count in grouped_data[:20].items():
+    for title, count in grouped_data[:100].items():
         rating_input = st.number_input(f"Rate {title} (1-5)", min_value=1, max_value=5, key=title)
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input}, ignore_index=True)
