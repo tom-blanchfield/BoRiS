@@ -76,7 +76,8 @@ else:
     rating = st.selectbox(f"Rate the book '{title}'", options=[0, 1, 2, 3, 4, 5])
 
     # Add the rating to the user_ratings DataFrame
-    user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating}, ignore_index=True)
+    user_ratings = user_ratings.append(pd.Series({'book_id': book_id, 'user_id': 'user1', 'rating': rating}), ignore_index=True)
+
 
 # Generate recommendations based on user ratings
 st.title("Recommended Books:")
