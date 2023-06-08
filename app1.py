@@ -51,7 +51,7 @@ if len(grouped_data) == 0:
     st.write("No books found with selected authors or genres")
 else:
     columns = st.beta_columns(3)
-    for column_idx, (title, count) in enumerate(grouped_data[:50].items()):
+    for column_idx, (title, count) in enumerate(grouped_data[:20].items()):
         # Get the book ID and image URL
         book_id = books.loc[books['title'] == title, 'book_id'].values[0]
         image_url = books.loc[books['title'] == title, 'image_url'].values[0]
