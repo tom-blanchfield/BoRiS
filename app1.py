@@ -143,7 +143,7 @@ if st.button("Get Recommendations!"):
                 # Display the book cover image, title, and author
                 with columns[column_idx % 3]:
                     st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
-                    st.write(f"{title} by {author}")
+              
 
             except (requests.HTTPError, OSError) as e:
                 st.write(f"Error loading image: {e}")
