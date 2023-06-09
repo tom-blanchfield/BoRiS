@@ -136,8 +136,7 @@ else:
         row_images = []
 
         # Download and resize the cover images for the row
-        for title, author in row_books:
-            book_id = books.loc[(books['title'] == title) & (books['authors'] == author), 'book_id'].values[0]
+        for book_id in row_books:
             image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
             try:
@@ -158,3 +157,4 @@ else:
         columns = st.columns(len(row_images))
         for column, image in zip(columns, row_images):
             column.image(image, use_column_width=True)
+
