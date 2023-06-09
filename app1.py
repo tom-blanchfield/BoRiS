@@ -120,29 +120,41 @@ if st.button("Get Recommendations!"):
                 recommended_books.append((title, author))
                 recommended_ids.append(book_id)
 
-    # Display recommended books
-    if len(recommended_books) == 0:
-        st.write("No book recommendations found.")
-    else:
-        st.write("Recommended books:")
-        columns = st.columns(3)
-        for column_idx, (title, author) in enumerate(recommended_books):
-            # Get the book ID and image URL
-            book_id = recommended_ids[column_idx]
+# Display recommended books
+if len(recommended_books) == 0:
+    st.write("No book recommendations found.")
+else:
+    st.write("Recommended books:")
+
+    # Create rows to display the recommended books
+    rows = []
+    row_size = 3  # Number of books per row
+
+    # Iterate over recommended books and create rows
+    for i in range(0, len(recommended_books), row_size):
+        row_books = recommended_books[i:i+row_size]
+        row_images = []
+
+        # Download and resize the cover images for the row
+        for title, author in row_books:
+            book_id = books.loc[(books['title'] == title) & (books['authors'] == author), 'book_id'].values[0]
             image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
-            # Download the image from the URL
+
             try:
                 response = requests.get(image_url, stream=True)
                 response.raise_for_status()
                 image = Image.open(response.raw)
-
-                # Adjust the image size
                 resized_image = image.resize((200, 300))
-
-                # Display the book cover image, title, and author
-                with columns[column_idx % 3]:
-                    st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
-                    st.write(f"{title} by {author}")
+                row_images.append(resized_image)
 
             except (requests.HTTPError, OSError) as e:
                 st.write(f"Error loading image: {e}")
+
+        # Add the row to the rows list
+        rows.append(row_images)
+
+    # Display the rows of recommended books
+    for row_images in rows:
+        columns = st.columns(len(row_images))
+        for column, image in zip(columns, row_images):
+            column.image(image, use_column_width=True)
