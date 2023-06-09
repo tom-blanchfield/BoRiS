@@ -119,30 +119,29 @@ if st.button("Get Recommendations!"):
                 recommended_books.append((title, author))
                 recommended_ids.append(book_id)
 
-    # Display recommended books
-    if len(recommended_books) == 0:
-        st.write("No book recommendations found.")
-    else:
-        st.write("Recommended books:")
-        columns = st.columns(3)
-        for column_idx, (title, author) in enumerate(recommended_books):
-            # Get the book ID and image URL
-            book_id = recommended_ids[column_idx]
-            image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
+# Display recommended books
+if len(recommended_books) == 0:
+    st.write("No book recommendations found.")
+else:
+    st.write("Recommended books:")
+    columns = st.columns(len(recommended_books))
+    for column_idx, (title, author) in enumerate(recommended_books):
+        # Get the book ID and image URL
+        book_id = recommended_ids[column_idx]
+        image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
-             # Download the image from the URL
-            try:
-                response = requests.get(image_url, stream=True)
-                response.raise_for_status()
-                image = Image.open(response.raw)
+         # Download the image from the URL
+        try:
+            response = requests.get(image_url, stream=True)
+            response.raise_for_status()
+            image = Image.open(response.raw)
 
-                # Adjust the image size
-                resized_image = image.resize((200, 300))
+            # Adjust the image size
+            resized_image = image.resize((200, 300))
 
-                # Display the book cover image, title, and author
-                with columns[column_idx % 3]:
-                    st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
-              
+            # Display the book cover image, title, and author
+            with columns[column_idx]:
+                st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
 
-            except (requests.HTTPError, OSError) as e:
-                st.write(f"Error loading image: {e}")
+        except (requests.HTTPError, OSError) as e:
+            st.write(f"Error loading image: {e}")
