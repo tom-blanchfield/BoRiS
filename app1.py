@@ -68,7 +68,6 @@ else:
             # Display the book cover image, title, and author
             with columns[column_idx % 3]:
                 st.image(resized_image, caption=f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}", use_column_width=True)
-                st.write(f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}")
 
                 # Ask the user to rate the book
                 rating_input = st.number_input(label="", min_value=1, max_value=5, key=title)
