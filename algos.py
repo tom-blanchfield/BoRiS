@@ -92,7 +92,7 @@ def calculate_similarity(algorithm):
         st.text("Euclidean Distance measures the dissimilarity between users based on their \nrating patterns. Lower scores indicate more similar users.")
 
     elif algorithm == 'Non-Zero Matrix Factorisation':
-        st.text("Calculating Non-Zero Matrix Factorsation Similarities...")
+        st.text("Calculating Non-Zero Matrix Factorisation Similarities...")
         # Implement the NMF algorithm
         nmf = NMF(n_components=10)
         nmf.fit(user_ratings_pivot)
@@ -104,7 +104,7 @@ def calculate_similarity(algorithm):
         similarities = cosine_similarity(user_features, item_features.T)
         similarity_score = np.mean(similarities)
         st.text(f"Non-Zero Matrix Factorisation Similarities calculation complete.\nSimilarity Score: {similarity_score:.4f}")
-        st.text("Non-Zero Matrix Factorisation calculates the similarity between users based on a \nmatrix factorization approach.\nHigher scores indicate more similar users.")
+        st.text("Non-Zero Matrix Factorisation calculates the similarity between users based on a \nmatrix factorisation approach.\nHigher scores indicate more similar users.")
 
 # Streamlit app
 st.title("Recommender Algorithm Evaluator")
