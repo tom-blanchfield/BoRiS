@@ -65,9 +65,10 @@ else:
             # Adjust the image size
             resized_image = image.resize((200, 300))
 
-            # Display the book cover image
+            # Display the book cover image, title, and author
             with columns[column_idx % 3]:
                 st.image(resized_image, caption=f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}", use_column_width=True)
+                st.write(f"{title} by {books.loc[books['title'] == title, 'authors'].values[0]}")
 
                 # Ask the user to rate the book
                 rating_input = st.number_input(label="", min_value=1, max_value=5, key=title)
@@ -124,5 +125,24 @@ if st.button("Get Recommendations!"):
         st.write("No book recommendations found.")
     else:
         st.write("Recommended books:")
-        for book in recommended_books:
-            st.write("- {} by {}".format(book[0], book[1]))
+        columns = st.columns(3)
+        for column_idx, (title, author) in enumerate(recommended_books):
+            # Get the book ID and image URL
+            book_id = recommended_ids[column_idx]
+            image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
+            # Download the image from the URL
+            try:
+                response = requests.get(image_url, stream=True)
+                response.raise_for_status()
+                image = Image.open(response.raw)
+
+                # Adjust the image size
+                resized_image = image.resize((200, 300))
+
+                # Display the book cover image, title, and author
+                with columns[column_idx % 3]:
+                    st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
+                    st.write(f"{title} by {author}")
+
+            except (requests.HTTPError, OSError) as e:
+                st.write(f"Error loading image: {e}")
