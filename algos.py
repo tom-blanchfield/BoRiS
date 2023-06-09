@@ -91,8 +91,8 @@ def calculate_similarity(algorithm):
         st.text(f"Euclidean Distances calculation complete.\nSimilarity Score: {similarity_score:.4f}")
         st.text("Euclidean Distance measures the dissimilarity between users based on their \nrating patterns. Lower scores indicate more similar users.")
 
-    elif algorithm == 'Non-Zero Matrix Factorization':
-        st.text("Calculating Non-Zero Matrix Factorization Similarities...")
+    elif algorithm == 'Non-Zero Matrix Factorisation':
+        st.text("Calculating Non-Zero Matrix Factorsation Similarities...")
         # Implement the NMF algorithm
         nmf = NMF(n_components=10)
         nmf.fit(user_ratings_pivot)
