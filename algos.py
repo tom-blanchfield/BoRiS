@@ -23,7 +23,7 @@ if missing_columns:
 user_ratings_count = ratings['user_id'].value_counts()
 
 # Get the top 1,000 users by number of ratings
-top_users = user_ratings_count.nlargest(2000).index
+top_users = user_ratings_count.nlargest(5000).index
 
 # Filter ratings for the top users
 ratings = ratings[ratings['user_id'].isin(top_users)]
