@@ -126,17 +126,26 @@ if len(recommended_books) == 0:
 else:
     st.write("Recommended books:")
 
-    # Create rows to display the recommended books
+    # Define number of books per row
+    books_per_row = 3
+
+    # Calculate number of rows needed
+    num_rows = (len(recommended_books) + books_per_row - 1) // books_per_row
+
+    # Create empty list to store rows
     rows = []
-    row_size = 3  # Number of books per row
 
-    # Iterate over recommended books and create rows
-    for i in range(0, len(recommended_books), row_size):
-        row_books = recommended_books[i:i+row_size]
-        row_images = []
+    # Group recommended books into rows
+    for i in range(num_rows):
+        start_idx = i * books_per_row
+        end_idx = min(start_idx + books_per_row, len(recommended_books))
+        row_books = recommended_books[start_idx:end_idx]
+        rows.append(row_books)
 
-        # Download and resize the cover images for the row
-        for (title, author) in row_books:
+    # Display rows of recommended books
+    for row_books in rows:
+        columns = st.columns(len(row_books))
+        for column, (title, author) in zip(columns, row_books):
             book_id = books.loc[(books['title'] == title) & (books['authors'] == author), 'book_id'].values[0]
             image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
@@ -145,16 +154,7 @@ else:
                 response.raise_for_status()
                 image = Image.open(response.raw)
                 resized_image = image.resize((200, 300))
-                row_images.append((resized_image, title, author))
+                column.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
 
             except (requests.HTTPError, OSError) as e:
                 st.write(f"Error loading image: {e}")
-
-        # Add the row to the rows list
-        rows.append(row_images)
-
-    # Display the rows of recommended books
-    for row_images in rows:
-        columns = st.columns(len(row_images))
-        for column, (image, title, author) in zip(columns, row_images):
-            column.image(image, caption=f"{title} by {author}", use_column_width=True)
