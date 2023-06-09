@@ -120,41 +120,30 @@ if st.button("Get Recommendations!"):
                 recommended_books.append((title, author))
                 recommended_ids.append(book_id)
 
-# Display recommended books
-if len(recommended_books) == 0:
-    st.write("No book recommendations found.")
-else:
-    st.write("Recommended books:")
-
-    # Define number of books per row
-    books_per_row = 3
-
-    # Calculate number of rows needed
-    num_rows = (len(recommended_books) + books_per_row - 1) // books_per_row
-
-    # Create empty list to store rows
-    rows = []
-
-    # Group recommended books into rows
-    for i in range(num_rows):
-        start_idx = i * books_per_row
-        end_idx = min(start_idx + books_per_row, len(recommended_books))
-        row_books = recommended_books[start_idx:end_idx]
-        rows.append(row_books)
-
-    # Display rows of recommended books
-    for row_books in rows:
-        columns = st.columns(len(row_books))
-        for column, (title, author) in zip(columns, row_books):
-            book_id = books.loc[(books['title'] == title) & (books['authors'] == author), 'book_id'].values[0]
+    # Display recommended books
+    if len(recommended_books) == 0:
+        st.write("No book recommendations found.")
+    else:
+        st.write("Recommended books:")
+        columns = st.columns(3)
+        for column_idx, (title, author) in enumerate(recommended_books):
+            # Get the book ID and image URL
+            book_id = recommended_ids[column_idx]
             image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
+             # Download the image from the URL
             try:
                 response = requests.get(image_url, stream=True)
                 response.raise_for_status()
                 image = Image.open(response.raw)
+
+                # Adjust the image size
                 resized_image = image.resize((200, 300))
-                column.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
+
+                # Display the book cover image, title, and author
+                with columns[column_idx % 3]:
+                    st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
+                    st.write(f"{title} by {author}")
 
             except (requests.HTTPError, OSError) as e:
                 st.write(f"Error loading image: {e}")
