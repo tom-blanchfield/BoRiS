@@ -118,12 +118,12 @@ if st.button("Get Recommendations!"):
             if title not in recommended_books:
                 recommended_books.append((title, author))
                 recommended_ids.append(book_id)
-   # Display recommended books
+    # Display recommended books
     if len(recommended_books) == 0:
         st.write("No book recommendations found.")
     else:
         st.write("Recommended books:")
-        columns = st.columns(3)
+        columns = st.columns(len(recommended_books))
         for column_idx, (title, author) in enumerate(recommended_books):
             # Get the book ID and image URL
             book_id = recommended_ids[column_idx]
@@ -139,9 +139,8 @@ if st.button("Get Recommendations!"):
                 resized_image = image.resize((200, 300))
 
                 # Display the book cover image, title, and author
-                with columns[column_idx % 3]:
+                with columns[column_idx]:
                     st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
-              
 
             except (requests.HTTPError, OSError) as e:
                 st.write(f"Error loading image: {e}")
