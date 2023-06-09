@@ -136,7 +136,8 @@ else:
         row_images = []
 
         # Download and resize the cover images for the row
-        for book_id in row_books:
+        for (title, author) in row_books:
+            book_id = books.loc[(books['title'] == title) & (books['authors'] == author), 'book_id'].values[0]
             image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
             try:
@@ -144,7 +145,7 @@ else:
                 response.raise_for_status()
                 image = Image.open(response.raw)
                 resized_image = image.resize((200, 300))
-                row_images.append(resized_image)
+                row_images.append((resized_image, title, author))
 
             except (requests.HTTPError, OSError) as e:
                 st.write(f"Error loading image: {e}")
@@ -155,6 +156,5 @@ else:
     # Display the rows of recommended books
     for row_images in rows:
         columns = st.columns(len(row_images))
-        for column, image in zip(columns, row_images):
-            column.image(image, use_column_width=True)
-
+        for column, (image, title, author) in zip(columns, row_images):
+            column.image(image, caption=f"{title} by {author}", use_column_width=True)
