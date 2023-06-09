@@ -23,7 +23,7 @@ if missing_columns:
 user_ratings_count = ratings['user_id'].value_counts()
 
 # Get the top 1,000 users by number of ratings
-top_users = user_ratings_count.nlargest(1000).index
+top_users = user_ratings_count.nlargest(2000).index
 
 # Filter ratings for the top users
 ratings = ratings[ratings['user_id'].isin(top_users)]
@@ -40,12 +40,12 @@ algorithms = [
     'Adjusted Cosine Similarity',
     'Jaccard',
     'Euclidean Distance',
-    'Non-Zero Matrix Factorization'
+    'Non-Zero Matrix Factorisation'
 ]
 
 # Function to calculate algorithm similarity
 def calculate_similarity(algorithm):
-    similarity_score = None  # Initialize the similarity_score variable
+    similarity_score = None  # Initialise the similarity_score variable
 
     if algorithm == 'Cosine Similarity':
         st.text("Calculating Cosine Similarities...")
@@ -103,8 +103,8 @@ def calculate_similarity(algorithm):
         # to ensure compatibility for cosine similarity calculation
         similarities = cosine_similarity(user_features, item_features.T)
         similarity_score = np.mean(similarities)
-        st.text(f"Non-Zero Matrix Factorization Similarities calculation complete.\nSimilarity Score: {similarity_score:.4f}")
-        st.text("Non-Zero Matrix Factorization calculates the similarity between users based on a \nmatrix factorization approach.\nHigher scores indicate more similar users.")
+        st.text(f"Non-Zero Matrix Factorisation Similarities calculation complete.\nSimilarity Score: {similarity_score:.4f}")
+        st.text("Non-Zero Matrix Factorisation calculates the similarity between users based on a \nmatrix factorization approach.\nHigher scores indicate more similar users.")
 
 # Streamlit app
 st.title("Recommender Algorithm Evaluator")
