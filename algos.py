@@ -34,6 +34,15 @@ ratings = ratings[['user_id', 'book_id', 'rating']]
 # Create a pivot table of user ratings
 user_ratings_pivot = ratings.pivot_table(index='user_id', columns='book_id', values='rating', fill_value=0)
 
+# List of algorithms to test
+algorithms = [
+    'Cosine Similarity',
+    'Adjusted Cosine Similarity',
+    'Jaccard',
+    'Euclidean Distance',
+    'Non-Zero Matrix Factorization'
+]
+
 # Function to calculate algorithm similarity
 def calculate_similarity(algorithm):
     similarity_score = None  # Initialize the similarity_score variable
@@ -97,26 +106,16 @@ def calculate_similarity(algorithm):
         st.text(f"Non-Zero Matrix Factorization Similarities calculation complete.\nSimilarity Score: {similarity_score:.4f}")
         st.text("Non-Zero Matrix Factorization calculates the similarity between users based on a \nmatrix factorization approach.\nHigher scores indicate more similar users.")
 
-
 # Streamlit app
 st.title("Recommender Algorithm Evaluator")
 st.sidebar.title("Options")
 
-# Algorithm selection
-algorithm = st.sidebar.selectbox("Select Algorithm", ['Cosine Similarity', 'Adjusted Cosine Similarity', 'Jaccard', 'Euclidean Distance',
-                                                      'Non-Zero Matrix Factorization'])
+if st.sidebar.button("Test Algorithms"):
+    results = {}  # Dictionary to store the results of each algorithm
+    for algorithm in algorithms:
+        similarity_score = calculate_similarity(algorithm)  # Assign the similarity score to a variable
+        results[algorithm] = similarity_score  # Store the similarity score
 
-# Increase the test size to 0.2 for all algorithms
-test_size = 0.2
 
-# Convert pandas DataFrame to Surprise Dataset
-reader = Reader(rating_scale=(1, 5))
-data = Dataset.load_from_df(ratings, reader)
 
-# Split the data into train and test sets
-train_set, test_set = train_test_split(data, test_size=test_size, random_state=42)
-
-# Calculate similarity scores only if the algorithm is selected
-similarity_scores = {}
-if algorithm != "":
-    similarity_scores[algorithm] = calculate_similarity(algorithm)
+ 
