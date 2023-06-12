@@ -16,7 +16,6 @@ book_data = pd.merge(books, book_tags, on='goodreads_book_id')
 book_data = pd.merge(book_data, tags, on='tag_id')
 
 # Define the list of genres
-genre_list = [# Define the list of genres
 genre_list = ["literature", "comedy", "young-adult", "romance", "mystery", "suicide", "science-fiction", "fantasy", "horror", "thriller", "western", "erotic", "dystopian", "memoir", "biography", "autobiography", "history", "travel", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion", "art", "music", "comics", "graphic novels", "poetry", "sport", "humorous", "war", "funny"]
 
 # Title
