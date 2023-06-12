@@ -19,7 +19,7 @@ book_data = pd.merge(book_data, tags, on='tag_id')
 genre_list = ["literature", "comedy", "young-adult", "romance", "mystery", "science-fiction", "fantasy", "horror", "thriller", "western", "erotic", "dystopian", "memoir", "biography", "autobiography", "history", "travel", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion", "art", "music", "comics", "graphic novels", "poetry", "sport", "humorous", "war", "funny"]
 
 # Title
-st.sidebar.title("Please choose whether to get recommendations based on authors or genres, then add as many as you'd like")
+st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like")
 
 # Dropdown menu to select recommendation type
 selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
