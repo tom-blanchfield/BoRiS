@@ -16,7 +16,7 @@ book_data = pd.merge(books, book_tags, on='goodreads_book_id')
 book_data = pd.merge(book_data, tags, on='tag_id')
 
 # Define the list of genres
-genre_list = ["literature", "comedy", "young-adult", "romance", "mystery", "suicide", "science-fiction", "fantasy", "horror", "thriller", "western", "erotic", "dystopian", "memoir", "biography", "autobiography", "history", "travel", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion", "art", "music", "comics", "graphic novels", "poetry", "sport", "humorous", "war", "funny"]
+genre_list = ["literature", "comedy", "young-adult"]
 
 # Title
 st.sidebar.title("Please choose your favourite authors and/or genres")
@@ -67,7 +67,7 @@ for column_idx, book in grouped_data.iterrows():
             st.image(resized_image, caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'].values[0]}", use_column_width=True)
 
         # Add rating of 5 to user's ratings
-        user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user_id', 'rating': 5}, ignore_index=True)
+        user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user_id'], 'rating': [5]})], ignore_index=True)
 
         included_books.add(title)
 
