@@ -24,8 +24,7 @@ genre_list = ["literature", "comedy", "young-adult", "romance", "mystery", "scie
               "art", "music", "comics", "graphic-novels", "poetry", "sport", "humorous", "war", "funny"]
 
 # Title
-st.sidebar.title(
-    "Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
+st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
 
 # Dropdown menu to select recommendation type
 selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
@@ -100,7 +99,7 @@ if st.button("Get Recommendations!"):
 
         
         # Get the ratings of the top 2,000 raters
-        top_raters = ratings.groupby('user_id').size().nlargest(2000).index.tolist()
+        top_raters = ratings.groupby('user_id').size().nlargest(5000).index.tolist()
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
