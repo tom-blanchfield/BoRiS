@@ -96,7 +96,8 @@ def export_csv(data):
 
 # Get recommendations if button is clicked
 if st.button("Get Recommendations!"):
-    if (selection_type == "Authors" and len(selected_authors) > 0) or selection_type == "Genres" and len(selected_genres) > 0):
+    if (selection_type == "Authors" and len(selected_authors) > 0) or (selection_type == "Genres" and len(selected_genres) > 0):
+
         
         # Get the ratings of the top 2,000 raters
         top_raters = ratings.groupby('user_id').size().nlargest(2000).index.tolist()
