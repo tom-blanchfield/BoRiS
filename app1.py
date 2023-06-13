@@ -40,7 +40,7 @@ else:
     filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
 
 # Group by book and sort by count
-grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 'count')).reset_index(drop=True)
+grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(102, 'count')).reset_index(drop=True)
 
 # Create a DataFrame to store user ratings
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
@@ -96,8 +96,7 @@ def export_csv(data):
 
 # Get recommendations if button is clicked
 if st.button("Get Recommendations!"):
-    if (selection_type == "Authors" and len(selected_authors) > 0) or (
-            selection_type == "Genres" and len(selected_genres) > 0):
+    if (selection_type == "Authors" and len(selected_authors) > 0) or selection_type == "Genres" and len(selected_genres) > 0):
         # Get the ratings of the top 2,000 raters
         top_raters = ratings.groupby('user_id').size().nlargest(2000).index.tolist()
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
@@ -129,7 +128,7 @@ if st.button("Get Recommendations!"):
         recommended_books = []
         recommended_ids = []
         for book_id in top_rated_books.index:
-            if len(recommended_books) >= 102:
+            if len(recommended_books) >= 30:
                 break
             title = books.loc[books['book_id'] == book_id, 'title'].values[0]
             author = books.loc[books['book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
