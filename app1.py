@@ -1,3 +1,4 @@
+import csv
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
@@ -16,17 +17,22 @@ book_data = pd.merge(books, book_tags, on='goodreads_book_id')
 book_data = pd.merge(book_data, tags, on='tag_id')
 
 # Define the list of genres
-genre_list = ["literature", "comedy", "young-adult", "romance", "mystery", "science-fiction", "fantasy", "horror", "thriller", "western", "erotic", "dystopian", "memoir", "biography", "autobiography", "history", "travel", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion", "art", "music", "comics", "graphic novels", "poetry", "sport", "humorous", "war", "funny"]
+genre_list = ["literature", "comedy", "young-adult", "romance", "mystery", "science-fiction", "fantasy", "horror",
+              "thriller", "western", "erotic", "dystopian", "memoir", "biography", "autobiography", "history",
+              "travel", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion",
+              "art", "music", "comics", "graphic novels", "poetry", "sport", "humorous", "war", "funny"]
 
 # Title
-st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like and press 'Get Recommendations!'")
+st.sidebar.title(
+    "Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like and press 'Get Recommendations!'")
 
 # Dropdown menu to select recommendation type
 selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
 
 if selection_type == "Authors":
     # Allow the user to select multiple authors
-    selected_authors = st.sidebar.multiselect("Select authors", list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
+    selected_authors = st.sidebar.multiselect("Select authors",
+                                              list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
     filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors)]
 else:
     # Allow the user to select multiple genres
@@ -64,19 +70,33 @@ for column_idx, book in grouped_data.iterrows():
 
         # Display the book cover image, title, and author
         with columns[column_idx % 3]:
-            st.image(resized_image, caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'].values[0]}", use_column_width=True)
+            st.image(resized_image,
+                     caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'].values[0]}",
+                     use_column_width=True)
 
         # Add rating of 5 to user's ratings
-        user_ratings = pd.concat([user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user_id'], 'rating': [5]})], ignore_index=True)
+        user_ratings = pd.concat([user_ratings,
+                                  pd.DataFrame({'book_id': [book_id], 'user_id': ['user_id'], 'rating': [5]})],
+                                 ignore_index=True)
 
         included_books.add(title)
 
     except (requests.HTTPError, OSError) as e:
         st.write(f"Error loading image: {e}")
 
+
+def export_csv(data):
+    with open('recommended_books.csv', 'w', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(['Title', 'Author'])  # Write header
+        writer.writerows(data)  # Write data rows
+    st.success("CSV file exported successfully!")
+
+
 # Get recommendations if button is clicked
 if st.button("Get Recommendations!"):
-    if (selection_type == "Authors" and len(selected_authors) > 0) or (selection_type == "Genres" and len(selected_genres) > 0):
+    if (selection_type == "Authors" and len(selected_authors) > 0) or (
+            selection_type == "Genres" and len(selected_genres) > 0):
         # Get the ratings of the top 2,000 raters
         top_raters = ratings.groupby('user_id').size().nlargest(2000).index.tolist()
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
@@ -143,3 +163,10 @@ if st.button("Get Recommendations!"):
 
                 except (requests.HTTPError, OSError) as e:
                     st.write(f"Error loading image: {e}")
+
+            recommended_books_data = []
+            for column_idx, (title, author) in enumerate(recommended_books):
+                recommended_books_data.append((title, author))
+
+            if st.button("Export CSV"):
+                export_csv(recommended_books_data)
