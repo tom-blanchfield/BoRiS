@@ -9,4 +9,4 @@ matplotlib
 surprise
 uuid
 streamlit==1.6
-base64
+
