@@ -21,7 +21,7 @@ book_data = pd.merge(book_data, tags, on='tag_id')
 genre_list = ["literature", "comedy", "young-adult", "romance", "mystery", "science-fiction", "fantasy", "horror",
               "thriller", "western", "erotic", "dystopian", "memoir", "biography", "autobiography", "history",
               "travel", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion",
-              "art", "music", "comics", "graphic novels", "poetry", "sport", "humorous", "war", "funny"]
+              "art", "music", "comics", "graphic-novels", "poetry", "sport", "humorous", "war", "funny"]
 
 # Title
 st.sidebar.title(
