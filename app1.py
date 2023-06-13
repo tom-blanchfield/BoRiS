@@ -1,10 +1,11 @@
-import csv
 import pandas as pd
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 import streamlit as st
 from PIL import Image
 import requests
+import csv
+import base64
 
 # Load the data
 books = pd.read_csv('books.csv')
@@ -33,7 +34,8 @@ if selection_type == "Authors":
     # Allow the user to select multiple authors
     selected_authors = st.sidebar.multiselect("Select authors",
                                               list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
-    filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors)]
+    filtered_data = book_data[
+        book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors)]
 else:
     # Allow the user to select multiple genres
     selected_genres = st.sidebar.multiselect("Select genres", genre_list)
@@ -75,9 +77,9 @@ for column_idx, book in grouped_data.iterrows():
                      use_column_width=True)
 
         # Add rating of 5 to user's ratings
-        user_ratings = pd.concat([user_ratings,
-                                  pd.DataFrame({'book_id': [book_id], 'user_id': ['user_id'], 'rating': [5]})],
-                                 ignore_index=True)
+        user_ratings = pd.concat(
+            [user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user_id'], 'rating': [5]})],
+            ignore_index=True)
 
         included_books.add(title)
 
@@ -86,11 +88,12 @@ for column_idx, book in grouped_data.iterrows():
 
 
 def export_csv(data):
-    with open('recommended_books.csv', 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Title', 'Author'])  # Write header
-        writer.writerows(data)  # Write data rows
-    st.success("CSV file exported successfully!")
+    filename = "recommended_books.csv"
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Title', 'Author'])
+        writer.writerows(data)
+    return filename
 
 
 # Get recommendations if button is clicked
@@ -164,9 +167,7 @@ if st.button("Get Recommendations!"):
                 except (requests.HTTPError, OSError) as e:
                     st.write(f"Error loading image: {e}")
 
-            recommended_books_data = []
-            for column_idx, (title, author) in enumerate(recommended_books):
-                recommended_books_data.append((title, author))
-
-            if st.button("Export CSV"):
-                export_csv(recommended_books_data)
+            # Export CSV button
+            csv_data = [(title, author) for title, author in recommended_books]
+            csv_file = export_csv(csv_data)
+            st.markdown(f"### [Download Recommended Books CSV](data:file/csv;base64,{base64.b64encode(open(csv_file, 'rb').read()).decode()})")
