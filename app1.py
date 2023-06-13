@@ -99,7 +99,7 @@ if st.button("Get Recommendations!"):
 
         
         # Get the ratings of the top 2,000 raters
-        top_raters = ratings.groupby('user_id').size().nlargest(5000).index.tolist()
+        top_raters = ratings.groupby('user_id').size().nlargest(2000).index.tolist()
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
