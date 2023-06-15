@@ -28,7 +28,7 @@ if option == "Books":
     
 if option == "Book Tags":
     # Add a chart to show the top 50 most popular tags
-    top_tags = book_tags.groupby('tag_id').count().sort_values('count', ascending=False).head(50)
+    top_tags = book_tags.groupby('tag_id').count().sort_values('count', ascending=False).head(100)
     top_tags.reset_index(inplace=True)
     top_tags['tag_name'] = top_tags['tag_id'].apply(lambda x: tags.loc[tags['tag_id']==x, 'tag_name'].values[0])
     chart_data = top_tags[['tag_name', 'count']]
@@ -40,9 +40,6 @@ if option == "Book Tags":
         title='Top 50 Most Popular Book Tags'
     )
     st.altair_chart(bars, use_container_width=True)
-    #Show the tags dataframe    
-    st.header("Book Tags Data")
-    st.dataframe(book_tags)
         
     
 if option == "Ratings":
