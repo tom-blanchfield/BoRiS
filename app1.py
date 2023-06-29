@@ -39,7 +39,7 @@ else:
     filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
 
 # Group by book and sort by count
-grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 'count')).reset_index(drop=True)
+grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(51, 'count')).reset_index(drop=True)
 
 # Create a DataFrame to store user ratings
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
