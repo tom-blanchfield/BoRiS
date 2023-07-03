@@ -7,6 +7,10 @@ import requests
 import csv
 import base64
 
+# Set the color scheme
+sidebar_color = "#2ecfbf"
+page_color = "#cbf3f0"
+
 # Load the data
 books = pd.read_csv('books.csv')
 book_tags = pd.read_csv('book_tags.csv')
