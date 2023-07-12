@@ -31,7 +31,7 @@ selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", 
 
 if selection_type == "Authors":
     # Allow the user to select multiple authors
-    selected_authors = st.sidebar.multiselect("Select authors",list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
+    selected_authors = st.sidebar.multiselect("Type authors' names",list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
     filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors)]
 else:
     # Allow the user to select multiple genres
