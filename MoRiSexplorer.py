@@ -15,7 +15,7 @@ movies_metadata = pd.read_csv('movies_metadata.csv')
 ratings = pd.read_csv('ratings_small.csv')
 
 # Select the top 20% of raters based on the number of ratings
-top_raters = ratings['userId'].value_counts().head(int(len(ratings['userId'].unique()) 1)).index
+top_raters = ratings['userId'].value_counts().head(int(len(ratings['userId'].unique()) * 1)).index
 filtered_ratings = ratings[ratings['userId'].isin(top_raters)]
 
 # Data exploration app
