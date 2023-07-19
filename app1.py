@@ -19,8 +19,8 @@ book_data = pd.merge(book_data, tags, on='tag_id')
 
 # Define the list of genres
 genre_list = ["literature", "science", "comedy", "young-adult", "romance", "mystery", "science-fiction", "fantasy", "horror",
-              "thriller", "western", "erotic", "sex", "chocolate", "dirty", "boasting", "drugs", "dystopian", "memoir", "biography", "autobiography", "history",
-              "travel", "shovels", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion",
+              "thriller", "western", "erotic", "sex", "chocolate", "drugs", "dystopian", "memoir", "biography", "autobiography", "history",
+              "travel", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion",
               "art", "music", "comics", "graphic-novels", "poetry", "sport", "humorous", "war", "funny"]
 
 # Title
