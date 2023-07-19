@@ -35,7 +35,7 @@ selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", 
 if selection_type == "Authors":
     # Allow the user to select multiple authors to include
     selected_authors = st.sidebar.multiselect("Type authors' names", all_authors)
-    selected_authors_exclude = st.sidebar.multiselect("Select authors to exclude", all_authors, default=selected_authors)
+    selected_authors_exclude = st.sidebar.multiselect("Select authors to exclude", all_authors, default=[])
     
     filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors)]
     
