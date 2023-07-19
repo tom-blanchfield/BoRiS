@@ -23,6 +23,9 @@ genre_list = ["literature", "science", "comedy", "young-adult", "romance", "myst
               "travel", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion",
               "art", "music", "comics", "graphic-novels", "poetry", "sport", "humorous", "war", "funny"]
 
+# Get the list of all authors
+all_authors = list(set(books['authors'].apply(lambda x: x.split(',')[0].strip())))
+
 # Title
 st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
 
@@ -30,12 +33,19 @@ st.sidebar.title("Please choose whether to get your recommendations based on aut
 selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
 
 if selection_type == "Authors":
-    # Allow the user to select multiple authors
-    selected_authors = st.sidebar.multiselect("Type authors' names",list(set(books['authors'].apply(lambda x: x.split(',')[0].strip()))))
+    # Allow the user to select multiple authors to include
+    selected_authors = st.sidebar.multiselect("Type authors' names", all_authors)
+    selected_authors_exclude = st.sidebar.multiselect("Select authors to exclude", all_authors, default=selected_authors)
+    
     filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors)]
+    
+    if len(selected_authors_exclude) > 0:
+        filtered_data = filtered_data[~filtered_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors_exclude)]
 else:
     # Allow the user to select multiple genres
     selected_genres = st.sidebar.multiselect("Select genres", genre_list)
+    selected_authors_exclude = st.sidebar.multiselect("Select authors to exclude", all_authors)
+    
     filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
 
 # Group by book and sort by count
@@ -97,7 +107,6 @@ def export_csv(data):
 if st.button("Get Recommendations!"):
     if (selection_type == "Authors" and len(selected_authors) > 0) or (selection_type == "Genres" and len(selected_genres) > 0):
 
-        
         # Get the ratings of the top 2,000 raters
         top_raters = ratings.groupby('user_id').size().nlargest(2000).index.tolist()
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
@@ -124,7 +133,7 @@ if st.button("Get Recommendations!"):
         # Get the top-rated books of the 10 closest users and sort
         top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
 
-        # Get recommended books, excluding those containing "Potter"
+        # Get recommended books, excluding those containing "Potter" and authors to exclude
         user_rated_books = user_ratings_df['book_id'].tolist()
         recommended_books = []
         recommended_ids = []
@@ -133,7 +142,7 @@ if st.button("Get Recommendations!"):
                 break
             title = books.loc[books['book_id'] == book_id, 'title'].values[0]
             author = books.loc[books['book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
-            if 'Potter' not in title and book_id not in user_rated_books and title not in included_books:
+            if 'Potter' not in title and book_id not in user_rated_books and title not in included_books and author not in selected_authors_exclude:
                 recommended_books.append((title, author))
                 recommended_ids.append(book_id)
                 included_books.add(title)
