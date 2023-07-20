@@ -27,10 +27,10 @@ genre_list = ["literature", "science", "comedy", "young-adult", "romance", "myst
 all_authors = list(set(books['authors'].apply(lambda x: x.split(',')[0].strip())))
 
 # Title
-st.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
+st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
 
 # Dropdown menu to select recommendation type
-selection_type = st.sidebar.selectbox("Select recommendation type", ("Genres", "Authors"))
+selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
 
 if selection_type == "Authors":
     # Allow the user to select multiple authors to include
@@ -80,7 +80,7 @@ for column_idx, book in grouped_data.iterrows():
         # Display the book cover image, title, and author
         with columns[column_idx % 3]:
             st.image(resized_image,
-                     caption=f"{title} by {books.loc[books['goodreads_book_id'] == book_id, 'authors'].values[0]}",
+                     caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'].values[0]}",
                      use_column_width=True)
 
         # Add rating of 5 to user's ratings
@@ -94,12 +94,10 @@ for column_idx, book in grouped_data.iterrows():
         st.write(f"Error loading image: {e}")
 
 
-def export_csv(data, genre=None):
-    filename = f"recommended_books_{genre.capitalize()}.csv" if genre else "recommended_books.csv"
+def export_csv(data):
+    filename = "recommended_books.csv"
     with open(filename, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        if genre:
-            writer.writerow([f"Genre: {genre.capitalize()}"])
         writer.writerow(['Title', 'Author'])
         writer.writerows(data)
     return filename
@@ -142,8 +140,8 @@ if st.button("Get Recommendations!"):
         for book_id in top_rated_books.index:
             if len(recommended_books) >= 51:
                 break
-            title = books.loc[books['goodreads_book_id'] == book_id, 'title'].values[0]
-            author = books.loc[books['goodreads_book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
+            title = books.loc[books['book_id'] == book_id, 'title'].values[0]
+            author = books.loc[books['book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
             if 'Potter' not in title and book_id not in user_rated_books and title not in included_books and author not in selected_authors_exclude:
                 recommended_books.append((title, author))
                 recommended_ids.append(book_id)
@@ -157,7 +155,7 @@ if st.button("Get Recommendations!"):
                 st.write("Here are your Genre Based recommendations!")
                 
             for genre, group_data in grouped_data.groupby('tag_name'):
-                st.header(genre.capitalize())
+                st.header(genre)
                 columns = st.columns(3)
                 displayed_books = 0
                 for _, book in group_data.iterrows():
@@ -195,7 +193,11 @@ if st.button("Get Recommendations!"):
                     except (requests.HTTPError, OSError) as e:
                         st.write(f"Error loading image: {e}")
 
-            # Export CSV button for genre-based recommendations
+                # "Get more!" button
+                if len(group_data) > 15:
+                    st.button(f"Get more {genre} books!")
+
+            # Export CSV button
             csv_data = [(title, author) for title, author in recommended_books]
-            csv_file = export_csv(csv_data, genre=selected_genres[0] if selected_genres else None)
-            st.markdown(f'<a href="data:file/csv;base64,{base64.b64encode(open(csv_file, "rb").read()).decode()}" download="{csv_file}">Download Genre Based Recommendations CSV</a>', unsafe_allow_html=True)
+            csv_file = export_csv(csv_data)
+            st.markdown(f"### [Download Recommended Books CSV](data:file/csv;base64,{base64.b64encode(open(csv_file, 'rb').read()).decode()})")
