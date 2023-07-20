@@ -158,7 +158,7 @@ if selection_type == "Authors":
                 st.button(f"Get more {genre} books!")
 
         # Export CSV button
-        csv_data = [(title, author) for title, author in recommended_books]
+        csv_data = [(title, author) for title, author in grouped_data.iterrows()]
         csv_file = export_csv(csv_data)
         st.markdown(f"### [Download Recommended Books CSV](data:file/csv;base64,{base64.b64encode(open(csv_file, 'rb').read()).decode()})")
 else:
