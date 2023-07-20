@@ -199,21 +199,21 @@ def get_author_recommendations(selected_authors, selected_authors_exclude):
             csv_file = export_csv(csv_data)
             st.markdown(f"### [Download Recommended Books CSV](data:file/csv;base64,{base64.b64encode(open(csv_file, 'rb').read()).decode()})")
 # Get recommendations if button is clicked
-if st.button("Get Recommendations!"):
-    if (selection_type == "Authors" and len(selected_authors) > 0) or (selection_type == "Genres" and len(selected_genres) > 0):
-        if selection_type == "Authors":
-            get_author_recommendations(selected_authors, selected_authors_exclude)
-        else:
-            # Filter books by selected genres
-            filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
+#if st.button("Get Recommendations!"):
+  if (selection_type == "Authors" and len(selected_authors) > 0) or (selection_type == "Genres" and len(selected_genres) > 0):
+      if selection_type == "Authors":
+          get_author_recommendations(selected_authors, selected_authors_exclude)
+      else:
+          # Filter books by selected genres
+          filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
 
-            # Group by book and sort by count
-            grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 'count')).reset_index(drop=True)
+          # Group by book and sort by count
+          grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 'count')).reset_index(drop=True)
 
-            st.write("Your genre-based recommendations:")
+          st.write("Your genre-based recommendations:")
 
-            columns = st.columns(3)
-            included_books = set()
+          columns = st.columns(3)
+          included_books = set()
 
             for column_idx, book in grouped_data.iterrows():
                 title = book['title']
