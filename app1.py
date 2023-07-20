@@ -40,6 +40,7 @@ if selection_type == "Genres":
     if len(selected_genres) > 0:
         st.title("Here are your genre based recommendations:")
 
+    csv_data = []
     for genre in selected_genres:
         # Group by book and sort by count for the selected genre
         grouped_data = book_data[book_data['tag_name'] == genre].nlargest(21, 'count')
@@ -74,6 +75,21 @@ if selection_type == "Genres":
 
             except (requests.HTTPError, OSError) as e:
                 st.write(f"Error loading image: {e}")
+
+        # Append genre-based recommendations to CSV data
+        genre_recommendations = book_data[book_data['tag_name'] == genre].nlargest(21, 'count')[['title', 'authors']]
+        genre_data = [(f"Genre: {genre.capitalize()}", '', '')]
+        genre_data += [(title, author.split(',')[0].strip(), '') for title, author in genre_recommendations.values]
+        csv_data += genre_data
+
+    # Export CSV button for genre-based recommendations
+    if len(csv_data) > 0:
+        if st.button("Download Genre Based Recommendations CSV"):
+            filename = "genre_based_recommendations.csv"
+            with open(filename, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['Title', 'Author'])
+                writer.writerows(csv_data)
 
 elif selection_type == "Authors":
     # Allow the user to select multiple authors to include
@@ -126,22 +142,37 @@ elif selection_type == "Authors":
 
         # Display recommended books
         if len(recommended_books) == 0:
-            st.write("No book recommendations found for the selected authors.")
+            st.write("No book recommendations found.")
         else:
             columns = st.columns(3)
-            for i, (title, author) in enumerate(recommended_books):
-                image_url = books.loc[books['goodreads_book_id'] == recommended_ids[i], 'image_url'].values[0]
+            displayed_books = 0
+            for title, author in recommended_books:
+                if displayed_books >= 15:
+                    break
+                book_id = books[books['title'] == title]['goodreads_book_id'].values[0]
+                image_url = books[books['title'] == title]['image_url'].values[0]
+                # Download the image from the URL
                 try:
                     response = requests.get(image_url, stream=True)
                     response.raise_for_status()
                     image = Image.open(response.raw)
+                    # Adjust the image size
                     resized_image = image.resize((200, 300))
-                    with columns[i % 3]:
+                    # Display the book cover image, title, and author
+                    with columns[displayed_books % 3]:
                         st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
+                    # Add rating of 5 to user's ratings
+                    user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user_id', 'rating': 5},
+                                                       ignore_index=True)
+                    displayed_books += 1
                 except (requests.HTTPError, OSError) as e:
                     st.write(f"Error loading image: {e}")
 
-# Export CSV button
-if st.button("Download Genre Based Recommendations CSV"):
-    export_csv(selected_genres)
-
+        # Export CSV button for author-based recommendations
+        csv_data = [(title, author) for title, author in recommended_books]
+        if st.button("Download Author Based Recommendations CSV"):
+            filename = "author_based_recommendations.csv"
+            with open(filename, 'w', newline='', encoding='utf-8') as f:
+                writer = csv.writer(f)
+                writer.writerow(['Title', 'Author'])
+                writer.writerows(csv_data)
