@@ -36,9 +36,6 @@ if selection_type == "Genres":
     # Allow the user to select multiple genres
     selected_genres = st.sidebar.multiselect("Select genres", genre_list)
     selected_authors_exclude = st.sidebar.multiselect("Select authors to exclude", all_authors)
-    
-    if st.sidebar.button("Download Genre Based Recommendations"):
-        export_csv(selected_genres)
 
     if len(selected_genres) > 0:
         st.title("Here are your genre based recommendations:")
@@ -144,14 +141,7 @@ elif selection_type == "Authors":
                 except (requests.HTTPError, OSError) as e:
                     st.write(f"Error loading image: {e}")
 
-def export_csv(selected_genres):
-    with open('genre_based_recommendations.csv', 'w', newline='', encoding='utf-8') as f:
-        writer = csv.writer(f)
-        for genre in selected_genres:
-            writer.writerow([f"Genre: {genre.capitalize()}"])
-            genre_data = book_data[book_data['tag_name'] == genre].nlargest(21, 'count')
-            for _, book in genre_data.iterrows():
-                title = book['title']
-                author = books.loc[books['goodreads_book_id'] == book['goodreads_book_id'], 'authors'].values[0]
-                writer.writerow([title, author])
-            writer.writerow([])  # Add an empty line to separate genres
+# Export CSV button
+if st.button("Download Genre Based Recommendations CSV"):
+    export_csv(selected_genres)
+
