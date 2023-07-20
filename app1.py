@@ -108,7 +108,7 @@ def export_csv(data):
     filename = "recommended_books.csv"
     with open(filename, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
-        writer.writerow(['Title', 'Author'])
+        writer.writerow(['Genre', 'Title', 'Author'])
         writer.writerows(data)
     return filename
 
@@ -199,51 +199,55 @@ def get_author_recommendations(selected_authors, selected_authors_exclude):
             csv_file = export_csv(csv_data)
             st.markdown(f"### [Download Recommended Books CSV](data:file/csv;base64,{base64.b64encode(open(csv_file, 'rb').read()).decode()})")
 
-# Get recommendations if button is clicked
+# Get recommendations if the "Get Recommendations!" button is clicked
 if (selection_type == "Authors" and len(selected_authors) > 0) or (selection_type == "Genres" and len(selected_genres) > 0):
     if selection_type == "Authors":
         get_author_recommendations(selected_authors, selected_authors_exclude)
     else:
         # Filter books by selected genres
-        filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
+        filtered_data = book_data[book_data['tag_name'].isin(selected_genres) & ~book_data['goodreads_book_id'].isin(excluded_author_books)]
 
         # Group by book and sort by count
         grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 'count')).reset_index(drop=True)
 
-        st.write("Your genre-based recommendations:")
+        # Display genre-based recommendations
+        all_genre_recs = []
+        for genre in selected_genres:
+            genre_recs = []
+            genre_grouped_data = grouped_data[grouped_data['tag_name'] == genre]
 
-        columns = st.columns(3)
-        included_books = set()
+            for _, book in genre_grouped_data.iterrows():
+                title = book['title']
+                author = book['authors'].split(',')[0].strip()
+                genre_recs.append((title, author))
 
-        for column_idx, book in grouped_data.iterrows():
-            title = book['title']
-            author = book['authors'].split(',')[0].strip()
-            book_id = book['book_id']
-            image_url = book['image_url']
+            all_genre_recs.append((genre, genre_recs))
 
-            # Skip if the book is already displayed or in the exclude list
-            if title in included_books or author in selected_authors_exclude:
-                continue
+            st.write(f"## {genre.capitalize()} Recommendations")
+            columns = st.columns(3)
+            included_books = set()
 
-            # Download the image from the URL
-            try:
-                response = requests.get(image_url, stream=True)
-                response.raise_for_status()
-                image = Image.open(response.raw)
+            for column_idx, (title, author) in enumerate(genre_recs):
+                book_id = genre_grouped_data.iloc[column_idx]['book_id']
+                image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
 
-                # Adjust the image size
-                resized_image = image.resize((200, 300))
+                # Download the image from the URL
+                try:
+                    response = requests.get(image_url, stream=True)
+                    response.raise_for_status()
+                    image = Image.open(response.raw)
 
-                # Display the book cover image, title, and author
-                with columns[column_idx % 3]:
-                    st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
+                    # Adjust the image size
+                    resized_image = image.resize((200, 300))
 
-                included_books.add(title)
+                    # Display the book cover image, title, and author
+                    with columns[column_idx % 3]:
+                        st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
 
-            except (requests.HTTPError, OSError) as e:
-                st.write(f"Error loading image: {e}")
+                except (requests.HTTPError, OSError) as e:
+                    st.write(f"Error loading image: {e}")
 
-        # Export CSV button for genre-based recommendations
-        csv_data = [(book['title'], book['authors'].split(',')[0].strip()) for _, book in grouped_data.iterrows()]
-        csv_file = export_csv(csv_data)
-        st.markdown(f"### [Download Recommended Books CSV](data:file/csv;base64,{base64.b64encode(open(csv_file, 'rb').read()).decode()})")
+        # Export all genre-based recommendations to one CSV file
+        all_genre_recs_with_genre = [(genre, title, author) for genre, recs in all_genre_recs for title, author in recs]
+        csv_file = export_csv(all_genre_recs_with_genre)
+        st.markdown(f"### [Download All Genre Recommendations CSV](data:file/csv;base64,{base64.b64encode(open(csv_file, 'rb').read()).decode()})")
