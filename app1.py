@@ -239,7 +239,7 @@ if st.button("Get Recommendations!"):
                         st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
 
                     # Add rating of 5 to user's ratings
-                    user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user_id', 'rating': 5}, ignore_index=True)
+                    #user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user_id', 'rating': 5}, ignore_index=True)
 
                     included_books.add(title)
 
