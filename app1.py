@@ -27,10 +27,10 @@ genre_list = ["literature", "science", "comedy", "young-adult", "romance", "myst
 all_authors = list(set(books['authors'].apply(lambda x: x.split(',')[0].strip())))
 
 # Title
-st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
+st.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
 
 # Dropdown menu to select recommendation type
-selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
+selection_type = st.sidebar.selectbox("Select recommendation type", ("Genres", "Authors"))
 
 if selection_type == "Authors":
     # Allow the user to select multiple authors to include
@@ -95,7 +95,7 @@ for column_idx, book in grouped_data.iterrows():
 
 
 def export_csv(data, genre=None):
-    filename = f"recommended_books_{genre}.csv" if genre else "recommended_books.csv"
+    filename = f"recommended_books_{genre.capitalize()}.csv" if genre else "recommended_books.csv"
     with open(filename, 'w', newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
         if genre:
@@ -142,8 +142,8 @@ if st.button("Get Recommendations!"):
         for book_id in top_rated_books.index:
             if len(recommended_books) >= 51:
                 break
-            title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-            author = books.loc[books['book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
+            title = books.loc[books['goodreads_book_id'] == book_id, 'title'].values[0]
+            author = books.loc[books['goodreads_book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
             if 'Potter' not in title and book_id not in user_rated_books and title not in included_books and author not in selected_authors_exclude:
                 recommended_books.append((title, author))
                 recommended_ids.append(book_id)
@@ -195,11 +195,7 @@ if st.button("Get Recommendations!"):
                     except (requests.HTTPError, OSError) as e:
                         st.write(f"Error loading image: {e}")
 
-                # "Get more!" button
-                if len(group_data) > 15:
-                    st.button(f"Get more {genre} books!")
-
-            # Export CSV button for author-based recommendations
+            # Export CSV button for genre-based recommendations
             csv_data = [(title, author) for title, author in recommended_books]
-            csv_file = export_csv(csv_data)
-            st.markdown(f'<a href="data:file/csv;base64,{base64.b64encode(open(csv_file, "rb").read()).decode()}" download="{csv_file}">Download Recommended Books CSV</a>', unsafe_allow_html=True)
+            csv_file = export_csv(csv_data, genre=selected_genres[0] if selected_genres else None)
+            st.markdown(f'<a href="data:file/csv;base64,{base64.b64encode(open(csv_file, "rb").read()).decode()}" download="{csv_file}">Download Genre Based Recommendations CSV</a>', unsafe_allow_html=True)
