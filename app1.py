@@ -60,7 +60,10 @@ grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
 
 # Display books by selected authors or genres
-st.title("Your recommendations will be generated using these books:")
+if selection_type == "Authors":
+    st.title("Your recommendations will be generated using these books:")
+else:
+    st.title("Here are your genre-based recommendations:")
 
 columns = st.columns(3)
 included_books = set()
