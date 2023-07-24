@@ -53,7 +53,7 @@ grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
 
 # Display books by selected authors or genres
-st.title('Hi, I\'m BoRiS the Book Recommender System. You can type your favourite authors\' names and I will use their books as the seed for your recommendations. Once you\'ve selected all the authors you want to include, scroll to the bottom of the page and press "Get Recommendations!" Alternatively, you can select your favourite genres. When you do this, I will find the 21 top books of each genre and use them as the seed, so after you\'ve added your genres, scroll to the bottom of the page and press "Get Recommendations!"')
+st.title('Hi, I\'m BoRiS the Book Recommender System. You can type your favourite authors\' names and I will use their books as the seed for your recommendations. Once you\'ve selected all the authors you want to include, scroll to the bottom of the page and press "Get Recommendations!" \\Alternatively, you can select your favourite genres. When you do this, I will find the 21 top books of each genre and use them as the seed, so after you\'ve added your genres, scroll to the bottom of the page and press "Get Recommendations!"')
 columns = st.columns(3)
 
 included_books = set()
