@@ -32,6 +32,16 @@ st.sidebar.title("Please choose whether to get your recommendations based on aut
 # Dropdown menu to select recommendation type
 selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
 
+# Custom CSS for the main page to adjust the font size
+main_page_css = '''
+<style>
+    .main * {
+        font-size: 42px;
+    }
+</style>
+'''
+st.markdown(main_page_css, unsafe_allow_html=True)
+
 if selection_type == "Authors":
     # Allow the user to select multiple authors to include
     selected_authors = st.sidebar.multiselect("Type authors' names", all_authors)
@@ -53,7 +63,7 @@ grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
 
 # Display books by selected authors or genres
-st.title('Hi, I\'m BoRiS the Book Recommender System. You can type your favourite authors\' names and I will use their books as the seed for your recommendations. Once you\'ve selected all the authors you want to include, scroll to the bottom of the page and press "Get Recommendations!" \\Alternatively, you can select your favourite genres. When you do this, I will find the 21 top books of each genre and use them as the seed, so after you\'ve added your genres, scroll to the bottom of the page and press "Get Recommendations!"')
+st.title('Hi, I\'m BoRiS the Book Recommender System. You can type your favourite authors\' names and I will use their books as the seed for your recommendations. Once you\'ve selected all the authors you want to include, scroll to the bottom of the page and press "Get Recommendations!" Alternatively, you can select your favourite genres. When you do this, I will find the 21 top books of each genre and use them as the seed, so after you\'ve added your genres, scroll to the bottom of the page and press "Get Recommendations!"')
 columns = st.columns(3)
 
 included_books = set()
