@@ -8,6 +8,5 @@ seaborn
 matplotlib
 surprise
 uuid
-string
 streamlit==1.6
 
