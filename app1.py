@@ -36,7 +36,7 @@ selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", 
 main_page_css = '''
 <style>
     .main * {
-        font-size: 30px;
+        font-size: 28px;
     }
 </style>
 '''
