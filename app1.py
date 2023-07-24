@@ -36,7 +36,6 @@ if selection_type == "Authors":
     # Allow the user to select multiple authors to include
     selected_authors = st.sidebar.multiselect("Type authors' names", all_authors)
     selected_authors_exclude = st.sidebar.multiselect("Select authors to exclude", all_authors, default=[])
-    
     filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors)]
     
     if len(selected_authors_exclude) > 0:
@@ -45,7 +44,6 @@ else:
     # Allow the user to select multiple genres
     selected_genres = st.sidebar.multiselect("Select genres", genre_list)
     selected_authors_exclude = st.sidebar.multiselect("Select authors to exclude", all_authors)
-    
     filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
 
 # Group by book and sort by count
@@ -83,7 +81,7 @@ for column_idx, book in grouped_data.iterrows():
                      caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'].values[0]}",
                      use_column_width=True)
 
-        # Add rating of 5 to user's ratings
+        # Add rating of 5 to user's books
         user_ratings = pd.concat(
             [user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user_id'], 'rating': [5]})],
             ignore_index=True)
