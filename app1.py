@@ -146,7 +146,7 @@ if st.button("Get Recommendations!"):
         recommended_books = []
         recommended_ids = []
         for book_id in top_rated_books.index:
-            if len(recommended_books) >= 51:
+            if len(recommended_books) >= 50:
                 break
             title = books.loc[books['book_id'] == book_id, 'title'].values[0]
             author = books.loc[books['book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
