@@ -18,10 +18,10 @@ book_data = pd.merge(books, book_tags, on='goodreads_book_id')
 book_data = pd.merge(book_data, tags, on='tag_id')
 
 # Define the list of genres
-genre_list = ["comedy", "literature", "superheroes", "science", "young-adult", "science-fiction", "romance", "mystery", "fantasy", "horror",
+genre_list = ["comedy", "literature", "irish", "superheroes", "science", "young-adult", "science-fiction", "romance", "mystery", "fantasy", "horror",
               "paranormal", "thriller", "western", "dystopian", "memoir", "biography", "autobiography", "history",
               "travel", "cookbook", "self-help", "business", "finance", "war", "psychology", "philosophy", "religion",
-              "art", "music", "comics", "graphic-novels", "poetry", "sport", "funny"]
+              "art", "music", "comics", "graphic-novels", "poetry", "football", "sport", "funny"]
 
 # Get the list of all authors
 all_authors = list(set(books['authors'].apply(lambda x: x.split(',')[0].strip())))
