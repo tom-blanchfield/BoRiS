@@ -18,7 +18,7 @@ book_data = pd.merge(books, book_tags, on='goodreads_book_id')
 book_data = pd.merge(book_data, tags, on='tag_id')
 
 # Define the list of genres
-genre_list = ["adult", "comedy", "literature", "irish", "superheroes", "science", "young-adult", "science-fiction", "romance", "mystery", "fantasy", "horror",
+genre_list = ["comedy", "literature", "irish", "superheroes", "science", "young-adult", "science-fiction", "romance", "mystery", "fantasy", "horror",
               "paranormal", "thriller", "western", "dystopian", "memoir", "biography", "autobiography", "history",
               "travel", "cookbook", "self-help", "business", "finance", "war", "psychology", "philosophy", "religion",
               "art", "music", "comics", "graphic-novels", "poetry", "football", "sport", "funny"]
@@ -135,7 +135,7 @@ if st.button("Get Recommendations!"):
         user_similarities = cosine_similarity(merged_ratings)[0]
 
         # Get the indices of the 10 closest users and their ratings
-        closest_user_indices = user_similarities.argsort()[-11:-1]
+        closest_user_indices = user_similarities.argsort()[-21:-1]
         closest_user_ratings = merged_ratings.iloc[closest_user_indices]
 
         # Get the top-rated books of the 10 closest users and sort
