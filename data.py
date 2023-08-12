@@ -63,13 +63,20 @@ if option == "Book Tags":
     # Display the bar chart for genres
     genre_counts = pd.Series(genre_list).value_counts()
     genre_chart_data = pd.DataFrame({'Genre': genre_counts.index, 'Count': genre_counts.values})
+    
+    # Set a maximum of 5000 for the x-axis
+    max_count = 5000
     genre_bars = alt.Chart(genre_chart_data).mark_bar().encode(
-        x='Count',
+        x=alt.X('Count', scale=alt.Scale(domain=(0, max_count))),
         y=alt.Y('Genre', sort='-x'),
         tooltip=['Genre', 'Count']
     ).properties(
         title='Distribution of Genres'
     )
+    
+    # Display the charts
+    st.altair_chart(tags_bars, use_container_width=True)
+    st.altair_chart(genre_bars, use_container_width=True)
     
     # Display the charts
     st.altair_chart(tags_bars, use_container_width=True)
