@@ -26,61 +26,20 @@ if option == "Books":
     st.header("Books Data")
     st.dataframe(books)
     
-#if option == "Book Tags":
-#    # Add a chart to show the top 50 most popular tags
-#    top_tags = book_tags.groupby('tag_id').count().sort_values('count', ascending=False).head(50)
-#    top_tags.reset_index(inplace=True)
-#    top_tags['tag_name'] = top_tags['tag_id'].apply(lambda x: tags.loc[tags['tag_id']==x, 'tag_name'].values[0])
-#    chart_data = top_tags[['tag_name', 'count']]
-#    bars = alt.Chart(chart_data).mark_bar().encode(
-#        x='count',
-#        y=alt.Y('tag_name', sort='-x'),
-#        tooltip=['tag_name', 'count']
-#    ).properties(
-#        title='Top 50 Most Popular Book Tags'
-#    )
-#    st.altair_chart(bars, use_container_width=True)
 if option == "Book Tags":
-    # Generate the list of genres
-    genre_list = ["comedy", "literature", "irish", "superheroes", "science", "young-adult", "science-fiction", "romance", "mystery", "fantasy", "horror",
-                  "paranormal", "thriller", "western", "dystopian", "memoir", "biography", "autobiography", "history",
-                  "travel", "cookbook", "self-help", "business", "finance", "war", "psychology", "philosophy", "religion",
-                  "art", "music", "comics", "graphic-novels", "poetry", "football", "sport", "funny"]
-    
     # Add a chart to show the top 50 most popular tags
     top_tags = book_tags.groupby('tag_id').count().sort_values('count', ascending=False).head(50)
     top_tags.reset_index(inplace=True)
     top_tags['tag_name'] = top_tags['tag_id'].apply(lambda x: tags.loc[tags['tag_id']==x, 'tag_name'].values[0])
     chart_data = top_tags[['tag_name', 'count']]
-    tags_bars = alt.Chart(chart_data).mark_bar().encode(
+    bars = alt.Chart(chart_data).mark_bar().encode(
         x='count',
         y=alt.Y('tag_name', sort='-x'),
         tooltip=['tag_name', 'count']
     ).properties(
         title='Top 50 Most Popular Book Tags'
     )
-    
-    # Display the bar chart for genres
-    genre_counts = pd.Series(genre_list).value_counts()
-    genre_chart_data = pd.DataFrame({'Genre': genre_counts.index, 'Count': genre_counts.values})
-    
-    # Set a maximum of 5000 for the x-axis
-    max_count = 5000
-    genre_bars = alt.Chart(genre_chart_data).mark_bar().encode(
-        x=alt.X('Count', scale=alt.Scale(domain=(0, max_count))),
-        y=alt.Y('Genre', sort='-x'),
-        tooltip=['Genre', 'Count']
-    ).properties(
-        title='Distribution of Genres'
-    )
-    
-    # Display the charts
-    st.altair_chart(tags_bars, use_container_width=True)
-    st.altair_chart(genre_bars, use_container_width=True)
-    
-    # Display the charts
-    st.altair_chart(tags_bars, use_container_width=True)
-    st.altair_chart(genre_bars, use_container_width=True)        
+   st.altair_chart(bars, use_container_width=True)        
     
 if option == "Ratings":
     # Add a chart to show the distribution of average ratings
