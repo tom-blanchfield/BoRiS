@@ -39,7 +39,7 @@ if option == "Book Tags":
     ).properties(
         title='Top 50 Most Popular Book Tags'
     )
-   st.altair_chart(bars, use_container_width=True)        
+    st.altair_chart(bars, use_container_width=True)        
     
 if option == "Ratings":
     # Add a chart to show the distribution of average ratings
