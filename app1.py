@@ -135,7 +135,7 @@ if st.button("Get Recommendations!"):
         user_similarities = cosine_similarity(merged_ratings)[0]
 
         # Get the indices of the 10 closest users and their ratings
-        closest_user_indices = user_similarities.argsort()[-11:-1]
+        closest_user_indices = user_similarities.argsort()[-21:-1]
         closest_user_ratings = merged_ratings.iloc[closest_user_indices]
 
         # Get the top-rated books of the 10 closest users and sort
