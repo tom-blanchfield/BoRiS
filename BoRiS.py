@@ -27,7 +27,7 @@ genre_list = ["comedy", "literature", "science", "young-adult", "romance", "myst
 all_authors = list(set(books['authors'].apply(lambda x: x.split(',')[0].strip())))
 
 # Title
-st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
+#st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
 
 # Dropdown menu to select recommendation type
 selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
