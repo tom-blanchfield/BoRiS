@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 # Load the small dataset
-movies_metadata = pd.read_csv('movies_metadata.csv')
+#movies_metadata = pd.read_csv('movies_metadata.csv')
 ratings = pd.read_csv('ratings_small.csv')
 
 # Select the top 20% of raters based on the number of ratings
