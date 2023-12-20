@@ -18,7 +18,7 @@ book_data = pd.merge(books, book_tags, on='goodreads_book_id')
 book_data = pd.merge(book_data, tags, on='tag_id')
 
 # Define the list of genres
-genre_list = ["christmas", "comedy", "literature", "irish", "superheroes", "science", "young-adult", "science-fiction", "romance", "mystery", "fantasy", "horror",
+genre_list = ["christmas", "santa", "comedy", "literature", "irish", "superheroes", "science", "young-adult", "science-fiction", "romance", "mystery", "fantasy", "horror",
               "paranormal", "thriller", "western", "dystopian", "memoir", "biography", "autobiography", "history",
               "travel", "cookbook", "self-help", "business", "finance", "war", "psychology", "philosophy", "religion",
               "art", "music", "comics", "graphic-novels", "poetry", "football", "sport", "funny"]
@@ -57,7 +57,7 @@ else:
     filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
 
 # Group by book and sort by count
-grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(10, 'count')).reset_index(drop=True)
+grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(20, 'count')).reset_index(drop=True)
 
 # Create a DataFrame to store user ratings
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
