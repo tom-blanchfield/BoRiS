@@ -88,7 +88,7 @@ for column_idx, book in grouped_data.iterrows():
         # Display the book cover image, title, and author
         with columns[column_idx % 3]:
             st.image(resized_image,
-                     caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'].values[0]}",
+                     caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'.strip()].values[0]}",
                      use_column_width=True)
 
         # Add rating of 5 to user's books
