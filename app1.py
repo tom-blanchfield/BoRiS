@@ -151,7 +151,7 @@ if st.button("Get Recommendations!"):
             title = books.loc[books['book_id'] == book_id, 'title'].values[0]
             author = books.loc[books['book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
             if 'Potter' not in title and book_id not in user_rated_books and title not in included_books and author not in selected_authors_exclude:
-                recommended_books.append((title, author))
+                recommended_books.append((title, author.strip()))
                 recommended_ids.append(book_id)
                 included_books.add(title)
 
