@@ -1,9 +1,1 @@
-[theme]
-backgroundColor = "#FFFFFF"  # White background
-primaryColor = "#000000"  # Black sidebar
-textColor = "#000000"  # Black text
-font = "sans serif"
-
-[button]
-backgroundColor = "#FFFFFF"  # White background for buttons
-textColor = "#000000"  # Black text for buttons
+config.toml is in the .streamlit directory
