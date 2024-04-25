@@ -1,7 +1,9 @@
-
 [theme]
-#primaryColor="#E80C4B"
-#backgroundColor="#ffffff"
-#secondaryBackgroundColor="#000000"
-#textColor="#000000"
+backgroundColor = "#FFFFFF"  # White background
+primaryColor = "#000000"  # Black sidebar
+textColor = "#000000"  # Black text
+font = "sans serif"
 
+[button]
+backgroundColor = "#FFFFFF"  # White background for buttons
+textColor = "#000000"  # Black text for buttons
