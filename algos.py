@@ -5,7 +5,7 @@ from sklearn.metrics.pairwise import cosine_similarity, pairwise_distances
 from sklearn.decomposition import NMF
 import streamlit as st
 import altair as alt
-import surprise
+import surprise as sp
 
 # Attempt to import the Surprise package with error handling
 try:
