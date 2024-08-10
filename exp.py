@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
-import sklearn as sk
 from sklearn.metrics.pairwise import cosine_similarity
 import streamlit as st
-import re
+from PIL import Image
+import requests
+import csv
+import base64
 
 # Load the data
 books = pd.read_csv('books.csv')
@@ -15,50 +17,97 @@ ratings = pd.read_csv('ratings.csv')
 book_data = pd.merge(books, book_tags, on='goodreads_book_id')
 book_data = pd.merge(book_data, tags, on='tag_id')
 
-# Get top 1000 raters
-ratings_count = ratings.groupby('user_id').size().reset_index(name='count').sort_values('count', ascending=False)
-top_raters = ratings_count[:1000]['user_id'].tolist()
-
-# Get top 1000 tags
-tags_to_exclude = []
-tags_df = book_data[~book_data['tag_name'].isin(tags_to_exclude)].groupby('tag_name').size().reset_index(name='counts').sort_values('counts', ascending=False).head(1000)
-
-# Tags to include
-tags_to_include = ['young-adult', 'literature', 'romance', 'mystery', 'science-fiction', 'fantasy', 'horror', 'thriller', 'western', 'dystopian', 'memoir', 'biography', 'autobiography', 'history', 'travel', 'cookbook', 'self-help', 'business', 'finance', 'psychology', 'philosophy', 'religion', 'art', 'music', 'comics', 'graphic novels', 'poetry', 'sport']
-
-# Get top tags that are in the tags_to_include list
-top_tags = tags_df[tags_df['tag_name'].isin(tags_to_include)]['tag_name'].tolist()
+# Define the list of genres
+genre_list = ["literature", "science", "comedy", "young-adult", "romance", "mystery", "science-fiction", "fantasy", "horror",
+              "thriller", "western", "erotic", "sex", "chocolate", "dirty", "boasting", "drugs", "dystopian", "memoir", "biography", "autobiography", "history",
+              "travel", "shovels", "cookbook", "self-help", "business", "finance", "psychology", "philosophy", "religion",
+              "art", "music", "comics", "graphic-novels", "poetry", "sport", "humorous", "war", "funny"]
 
 # Title
-st.sidebar.title("Please choose your favourite genres, and or authors")
+st.sidebar.title("Please choose whether to get your recommendations based on authors or genres, then add as many of either as you'd like, and press 'Get Recommendations!'")
 
-#Allow the user to select multiple genres
-selected_tags = st.sidebar.multiselect("Select genres", top_tags)
+# Dropdown menu to select recommendation type
+selection_type = st.sidebar.selectbox("Select recommendation type", ("Authors", "Genres"))
 
-# Allow the user to select multiple authors
-selected_authors = st.sidebar.multiselect("Select authors", books['authors'])
-
-# Modify the filtered data based on the selected authors
-filtered_data = book_data[book_data['authors'].isin(selected_authors) | book_data['tag_name'].isin(selected_tags)]
+if selection_type == "Authors":
+    # Allow the user to select multiple authors
+    all_authors = list(set(books['authors'].apply(lambda x: x.split(',')[0].strip())))
+    selected_authors = st.sidebar.multiselect("Type authors' names to include", all_authors)
+    
+    # Allow the user to select authors to exclude
+    selected_authors_exclude = st.sidebar.multiselect("Type authors' names to exclude", all_authors)
+    
+    filtered_data = book_data[book_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors)]
+    
+    if len(selected_authors_exclude) > 0:
+        filtered_data = filtered_data[~filtered_data['authors'].apply(lambda x: x.split(',')[0].strip()).isin(selected_authors_exclude)]
+else:
+    # Allow the user to select multiple genres
+    selected_genres = st.sidebar.multiselect("Select genres", genre_list)
+    filtered_data = book_data[book_data['tag_name'].isin(selected_genres)]
 
 # Group by book and sort by count
-grouped_data = filtered_data.groupby('title')['count'].sum().sort_values(ascending=False)
+grouped_data = filtered_data.groupby('tag_name').apply(lambda x: x.nlargest(21, 'count')).reset_index(drop=True)
 
 # Create a DataFrame to store user ratings
 user_ratings = pd.DataFrame(columns=['book_id', 'user_id', 'rating'])
 
-# Display books to rate
-st.title("Please rate these books:")
-if len(grouped_data) == 0:
-    st.write("No books found with selected interests or authors")
-else:
-    for title, count in grouped_data[:40].items():
-        rating_input = st.number_input(f"Rate {title} (1-5)", min_value=0, max_value=5, key=title)
-        book_id = books.loc[books['title'] == title, 'book_id'].values[0]
-        user_ratings = user_ratings.append({'book_id': book_id, 'user_id': 'user1', 'rating': rating_input}, ignore_index=True)
+# Display books by selected authors or genres
+st.title("Your recommendations will be generated using these books:")
+
+columns = st.columns(3)
+included_books = set()
+for column_idx, book in grouped_data.iterrows():
+    title = book['title']
+    count = book['count']
+    book_id = book['book_id']
+    image_url = book['image_url']
+
+    if title in included_books:
+        continue
+
+    # Download the image from the URL
+    try:
+        response = requests.get(image_url, stream=True)
+        response.raise_for_status()
+        image = Image.open(response.raw)
+
+        # Adjust the image size
+        resized_image = image.resize((200, 300))
+
+        # Display the book cover image, title, and author
+        with columns[column_idx % 3]:
+            st.image(resized_image,
+                     caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'].values[0]}",
+                     use_column_width=True)
+
+        # Add rating of 5 to user's ratings
+        user_ratings = pd.concat(
+            [user_ratings, pd.DataFrame({'book_id': [book_id], 'user_id': ['user_id'], 'rating': [5]})],
+            ignore_index=True)
+
+        included_books.add(title)
+
+    except (requests.HTTPError, OSError) as e:
+        st.write(f"Error loading image: {e}")
+
+
+def export_csv(data):
+    filename = "recommended_books.csv"
+    with open(filename, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.writer(f)
+        writer.writerow(['Title', 'Author'])
+        writer.writerows(data)
+    return filename
+
+
+# Get recommendations if button is clicked
+if st.button("Get Recommendations!"):
+    if (selection_type == "Authors" and len(selected_authors) > 0) or (selection_type == "Genres" and len(selected_genres) > 0):
+
         
-    if st.button("Get Recommendations!"):
-        # Get the ratings of the top 1000 raters
+        # Get the ratings of the top 2,000 raters
+        top_raters = ratings.groupby('user_id').size().nlargest(2000).index.tolist()
         top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)]
         top_raters_ratings = top_raters_ratings.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
@@ -67,11 +116,8 @@ else:
         user_ratings_pivot = user_ratings_df.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
         user_ratings_pivot = user_ratings_pivot.reindex(columns=top_raters_ratings.columns, fill_value=0)
 
-        # Replace missing values with median
+        # Replace missing values with the median
         user_ratings_pivot = user_ratings_pivot.fillna(user_ratings_pivot.median())
-
-        # Get ratings of top 1000 raters
-        top_raters_ratings = ratings[ratings['user_id'].isin(top_raters)].pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
         # Merge user's ratings with top raters ratings
         merged_ratings = pd.concat([user_ratings_pivot, top_raters_ratings])
@@ -83,27 +129,51 @@ else:
         closest_user_indices = user_similarities.argsort()[-11:-1]
         closest_user_ratings = merged_ratings.iloc[closest_user_indices]
 
-        # Get top rated books of the 10 closest users and sort
+        # Get the top-rated books of the 10 closest users and sort
         top_rated_books = closest_user_ratings.mean().sort_values(ascending=False)
-        
-        # Get recommended books, excluding those containing Potter
+
+        # Get recommended books, excluding those containing "Potter" and authors to exclude
         user_rated_books = user_ratings_df['book_id'].tolist()
         recommended_books = []
         recommended_ids = []
         for book_id in top_rated_books.index:
-            if len(recommended_books) >= 50:
+            if len(recommended_books) >= 51:
                 break
             title = books.loc[books['book_id'] == book_id, 'title'].values[0]
-            authors = books.loc[books['book_id'] == book_id, 'authors'].values[0]
-            if 'Potter' not in title and book_id not in user_rated_books:
-                if title not in recommended_books:
-                    recommended_books.append((title, authors))
-                    recommended_ids.append(book_id)
-                    
+            author = books.loc[books['book_id'] == book_id, 'authors'].values[0].split(',')[0].strip()
+            if 'Potter' not in title and book_id not in user_rated_books and title not in included_books and author not in selected_authors_exclude:
+                recommended_books.append((title, author))
+                recommended_ids.append(book_id)
+                included_books.add(title)
+
         # Display recommended books
         if len(recommended_books) == 0:
             st.write("No book recommendations found.")
         else:
             st.write("Recommended books:")
-            for book in recommended_books:
-                st.write("- {} by {}".format(book[0], book[1]))
+            columns = st.columns(3)
+            for column_idx, (title, author) in enumerate(recommended_books):
+                # Get the book ID and image URL
+                book_id = recommended_ids[column_idx]
+                image_url = books.loc[books['book_id'] == book_id, 'image_url'].values[0]
+
+                # Download the image from the URL
+                try:
+                    response = requests.get(image_url, stream=True)
+                    response.raise_for_status()
+                    image = Image.open(response.raw)
+
+                    # Adjust the image size
+                    resized_image = image.resize((200, 300))
+
+                    # Display the book cover image, title, and author
+                    with columns[column_idx % 3]:
+                        st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
+
+                except (requests.HTTPError, OSError) as e:
+                    st.write(f"Error loading image: {e}")
+
+            # Export CSV button
+            csv_data = [(title, author) for title, author in recommended_books]
+            csv_file = export_csv(csv_data)
+            st.markdown(f"### [Download Recommended Books CSV](data:file/csv;base64,{base64.b64encode(open(csv_file, 'rb').read()).decode()})")
