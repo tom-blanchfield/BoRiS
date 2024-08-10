@@ -3,13 +3,23 @@ import numpy as np
 import sklearn as sk
 from sklearn.metrics.pairwise import cosine_similarity, pairwise_distances
 from sklearn.decomposition import NMF
-from surprise import SVD, KNNBasic, Dataset, Reader
-from surprise.model_selection import train_test_split, cross_validate
 import streamlit as st
 import altair as alt
 
+# Attempt to import the Surprise package with error handling
+try:
+    from surprise import SVD, KNNBasic, Dataset, Reader
+    from surprise.model_selection import train_test_split, cross_validate
+except ImportError as e:
+    st.error(f"An error occurred while importing the Surprise package: {e}")
+    st.stop()
+
 # Load the data
-ratings = pd.read_csv('ratings.csv')
+try:
+    ratings = pd.read_csv('ratings.csv')
+except FileNotFoundError:
+    st.error("The 'ratings.csv' file was not found. Please make sure the file is in the correct location.")
+    st.stop()
 
 # Ensure the ratings DataFrame has the required columns
 required_columns = ['user_id', 'book_id', 'rating']
@@ -45,13 +55,10 @@ algorithms = [
 
 # Function to calculate algorithm similarity
 def calculate_similarity(algorithm):
-    similarity_score = None  # Initialise the similarity_score variable
+    similarity_score = None  # Initialize the similarity_score variable
 
     if algorithm == 'Cosine Similarity':
         st.text("Calculating Cosine Similarities...")
-        # Get the unique book IDs from train_set
-        train_set_books = user_ratings_pivot.columns
-
         # Calculate similarity using the user_ratings_pivot pivot table
         similarities = cosine_similarity(user_ratings_pivot.T)
         similarity_score = np.mean(similarities)
@@ -105,6 +112,8 @@ def calculate_similarity(algorithm):
         similarity_score = np.mean(similarities)
         st.text(f"Non-Zero Matrix Factorisation Similarities calculation complete.\nSimilarity Score: {similarity_score:.4f}")
         st.text("Non-Zero Matrix Factorisation calculates the similarity between users based on a \nmatrix factorisation approach.\nHigher scores indicate more similar users.")
+    
+    return similarity_score
 
 # Streamlit app
 st.title("Recommender Algorithm Evaluator")
@@ -114,7 +123,12 @@ if st.sidebar.button("Test Algorithms"):
     results = {}  # Dictionary to store the results of each algorithm
     for algorithm in algorithms:
         similarity_score = calculate_similarity(algorithm)  # Assign the similarity score to a variable
-        results[algorithm] = similarity_score  # Store the similarity score
+        if similarity_score is not None:
+            results[algorithm] = similarity_score  # Store the similarity score
+
+    # Display the results
+    st.write("### Algorithm Similarity Scores")
+    st.write(results)
 
 
 
