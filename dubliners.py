@@ -60,7 +60,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-        st.write("Failed to fetch the text file from GitHub.")
+    st.write("Failed to fetch the text file from GitHub.")
 
 if __name__ == "__main__":
     main()
