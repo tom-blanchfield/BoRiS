@@ -3,6 +3,7 @@ import nltk
 from nltk.tokenize import sent_tokenize
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import re
+import requests
 
 # Download necessary NLTK resources
 nltk.download('punkt')
@@ -32,11 +33,13 @@ def filter_sentences(sentences):
 def main():
     st.title("Dubliners Sentence Generator")
 
-    # Upload the text file
-    uploaded_file = st.file_uploader("Upload the Dubliners text file", type=["txt"])
+    # GitHub raw URL for the Dubliners text file
+    github_raw_url = "https://raw.githubusercontent.com/yourusername/yourrepository/main/dubliners.txt"
     
-    if uploaded_file is not None:
-        text = uploaded_file.read().decode('utf-8')
+    # Fetch the text file from GitHub
+    response = requests.get(github_raw_url)
+    if response.status_code == 200:
+        text = response.text
         sentences = sent_tokenize(text)
         
         st.write(f"Total Sentences: {len(sentences)}")
@@ -54,6 +57,8 @@ def main():
             st.write(sentence)
         else:
             st.write("No sentences matched the criteria.")
+    else:
+        st.write("Failed to fetch the text file from GitHub.")
 
 if __name__ == "__main__":
     main()
