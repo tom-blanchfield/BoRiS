@@ -36,7 +36,7 @@ def main():
     st.title("Dubliners Sentence Generator")
 
     # GitHub raw URL for the Dubliners text file
-    github_raw_url = "https://raw.githubusercontent.com/yourusername/yourrepository/main/dubliners.txt"
+    github_raw_url = "https://github.com/tom-blanchfield/BoRiS/blob/b1209408bc162dc9df3f402769bcfe63d150d5f4/dubliners.txt"
     
     # Fetch the text file from GitHub
     response = requests.get(github_raw_url)
