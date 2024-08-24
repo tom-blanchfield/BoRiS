@@ -60,7 +60,7 @@ def main():
         else:
             st.write("No sentences matched the criteria.")
     else:
-        st.write("Failed to fetch the text file from GitHub.")
+        st.write("")
 
 if __name__ == "__main__":
     main()
