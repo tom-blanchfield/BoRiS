@@ -53,19 +53,20 @@ def main():
         text = response.text
         sentences = simple_sent_tokenize(text)
         
-        st.write(f"Total Sentences: {len(sentences)}")
+        #st.write(f"Total Sentences: {len(sentences)}")
 
         # Analyze and filter sentences
         filtered_sentences = filter_sentences(sentences)
 
-        st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
+        #st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
         
         if len(filtered_sentences) > 0:
-            # Display a random sentence from filtered sentences
-            import random
-            sentence = random.choice(filtered_sentences)
-            st.write("Here's a sentence with high alliteration and positive sentiment:")
-            st.write(sentence)
+            if st.button('Generate Another Sentence'):
+                # Display a random sentence from filtered sentences
+                import random
+                sentence = random.choice(filtered_sentences)
+                st.write("Here's a sentence with high alliteration and positive sentiment:")
+                st.write(sentence)
         else:
             st.write("No sentences matched the criteria.")
     else:
