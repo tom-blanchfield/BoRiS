@@ -22,22 +22,13 @@ def simple_sent_tokenize(text):
     sentences = sentence_endings.split(text)
     return sentences
 
-# Function to clean up sentences by removing extraneous punctuation and spaces
-def clean_sentence(sentence):
-    # Remove leading and trailing spaces and commas
-    sentence = sentence.strip()
-    sentence = re.sub(r'\s+', ' ', sentence)  # Replace multiple spaces with a single space
-    sentence = re.sub(r',+', ',', sentence)  # Replace multiple commas with a single comma
-    return sentence
-
 # Function to analyze and filter sentences
 def filter_sentences(sentences):
     candidate_sentences = []
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
         if sentiment_scores['compound'] > 0.5 and alliteration_score(sentence) > 0.1:
-            cleaned_sentence = clean_sentence(sentence)
-            candidate_sentences.append(cleaned_sentence)
+            candidate_sentences.append(sentence)
     return candidate_sentences
 
 # Streamlit App
