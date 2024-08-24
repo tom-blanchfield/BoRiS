@@ -5,9 +5,6 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import re
 import requests
 
-# Download necessary NLTK resources
-nltk.download('punkt')
-
 # Initialize the sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
 
@@ -58,6 +55,11 @@ def main():
         else:
             st.write("No sentences matched the criteria.")
     else:
+        st.write("Failed to fetch the text file from GitHub.")
+
+if __name__ == "__main__":
+    main()
+
         st.write("Failed to fetch the text file from GitHub.")
 
 if __name__ == "__main__":
