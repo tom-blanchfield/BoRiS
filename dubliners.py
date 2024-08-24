@@ -6,14 +6,16 @@ import requests
 # Initialize the sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
 
-# Function to calculate alliteration score
+# Function to calculate a stricter alliteration score
 def alliteration_score(sentence):
     words = re.findall(r'\b\w+', sentence.lower())
     if not words:
         return 0
-    first_letters = [word[0] for word in words]
-    letter_count = sum(first_letters.count(letter) > 1 for letter in set(first_letters))
-    return letter_count / len(words)
+    first_letters = [word[0] for word in words if word[0].isalpha()]
+    alliteration_count = sum(first_letters.count(letter) for letter in set(first_letters))
+    if len(words) > 1:
+        return alliteration_count / len(words)
+    return 0
 
 # Simple function to tokenize text into sentences
 def simple_sent_tokenize(text):
@@ -35,7 +37,7 @@ def filter_sentences(sentences):
     candidate_sentences = []
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
-        if sentiment_scores['compound'] > 0.5 and alliteration_score(sentence) > 0.1:
+        if sentiment_scores['compound'] > 0.5 and alliteration_score(sentence) > 0.2:  # Increased threshold
             cleaned_sentence = clean_sentence(sentence)
             candidate_sentences.append(cleaned_sentence)
     return candidate_sentences
@@ -53,12 +55,12 @@ def main():
         text = response.text
         sentences = simple_sent_tokenize(text)
         
-        #st.write(f"Total Sentences: {len(sentences)}")
+        st.write(f"Total Sentences: {len(sentences)}")
 
         # Analyze and filter sentences
         filtered_sentences = filter_sentences(sentences)
 
-        #st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
+        st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
         
         if len(filtered_sentences) > 0:
             if st.button('Generate Another Sentence'):
