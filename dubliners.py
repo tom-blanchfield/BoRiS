@@ -1,8 +1,6 @@
 import streamlit as st
-import nltk
-from nltk.tokenize import sent_tokenize
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import re
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import requests
 
 # Initialize the sentiment analyzer
@@ -16,6 +14,13 @@ def alliteration_score(sentence):
     first_letters = [word[0] for word in words]
     letter_count = sum(first_letters.count(letter) > 1 for letter in set(first_letters))
     return letter_count / len(words)
+
+# Simple function to tokenize text into sentences
+def simple_sent_tokenize(text):
+    # A basic sentence tokenizer using regular expressions
+    sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
+    sentences = sentence_endings.split(text)
+    return sentences
 
 # Function to analyze and filter sentences
 def filter_sentences(sentences):
@@ -31,13 +36,13 @@ def main():
     st.title("Dubliners Sentence Generator")
 
     # GitHub raw URL for the Dubliners text file
-    github_raw_url = "https://github.com/tom-blanchfield/BoRiS/blob/main/dubliners.txt"
+    github_raw_url = "https://raw.githubusercontent.com/yourusername/yourrepository/main/dubliners.txt"
     
     # Fetch the text file from GitHub
     response = requests.get(github_raw_url)
     if response.status_code == 200:
         text = response.text
-        sentences = sent_tokenize(text)
+        sentences = simple_sent_tokenize(text)
         
         st.write(f"Total Sentences: {len(sentences)}")
 
