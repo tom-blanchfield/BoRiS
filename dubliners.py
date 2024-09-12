@@ -37,7 +37,7 @@ def filter_sentences(sentences):
     candidate_sentences = []
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
-        if sentiment_scores['compound'] > 0.5 and alliteration_score(sentence) > 2:  # Increased threshold
+        if sentiment_scores['compound'] > 0.5 and alliteration_score(sentence) > 0.99:  # Increased threshold
             cleaned_sentence = clean_sentence(sentence)
             candidate_sentences.append(cleaned_sentence)
     return candidate_sentences
