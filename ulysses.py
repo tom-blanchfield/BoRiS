@@ -33,27 +33,45 @@ def clean_sentence(sentence):
 # Function to analyze and filter sentences
 def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold):
     candidate_sentences = []
+    
+    # For debugging, let's store failed sentences and why they failed
+    failed_sentences = []
+    
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
-        
-        # Apply multiple tone filters based on slider values
-        if (sentiment_scores['compound'] > sentiment_threshold and 
-            alliteration_score(sentence) > alliteration_threshold and
-            sentiment_scores['pos'] >= pos_threshold and
-            sentiment_scores['neg'] <= neg_threshold and
-            sentiment_scores['neu'] >= neu_threshold):
+        allit_score = alliteration_score(sentence)
+
+        # Relaxed condition: Allow slightly lower threshold match on sentiment and alliteration
+        if (sentiment_scores['compound'] >= sentiment_threshold or
+            sentiment_scores['pos'] >= pos_threshold or
+            sentiment_scores['neu'] >= neu_threshold or
+            allit_score >= alliteration_threshold) and sentiment_scores['neg'] <= neg_threshold:
             
             cleaned_sentence = clean_sentence(sentence)
             candidate_sentences.append(cleaned_sentence)
-            
+        else:
+            failed_sentences.append({
+                'sentence': sentence,
+                'compound': sentiment_scores['compound'],
+                'pos': sentiment_scores['pos'],
+                'neg': sentiment_scores['neg'],
+                'neu': sentiment_scores['neu'],
+                'alliteration': allit_score
+            })
+    
+    # Log failed sentences and why they were filtered out
+    st.write("Debug Info: Failed Sentences")
+    for fs in failed_sentences:
+        st.write(f"Sentence: {fs['sentence']}, Compound: {fs['compound']}, Pos: {fs['pos']}, Neg: {fs['neg']}, Neu: {fs['neu']}, Alliteration: {fs['alliteration']}")
+    
     return candidate_sentences
 
 # Streamlit App
 def main():
-    st.title("Ulysses Generator")
+    st.title("Ulysses Alliterative Question Generator")
 
     # GitHub raw URL for the Ulysses text file
-    github_raw_url = "https://github.com/tom-blanchfield/BoRiS/edit/main/ulysses.py"
+    github_raw_url = "https://raw.githubusercontent.com/your-username/your-repo/main/ulysses.txt"
     
     # Fetch the text file from GitHub
     response = requests.get(github_raw_url)
@@ -64,30 +82,14 @@ def main():
         st.write(f"Total Sentences: {len(sentences)}")
 
         # Add sliders for sentiment and alliteration thresholds
-        sentiment_threshold = st.slider("Set Sentiment Threshold (Compound)", 0.0, 1.0, 0.5)
-        alliteration_threshold = st.slider("Set Alliteration Threshold", 0.0, 2.0, 1.0)
+        sentiment_threshold = st.slider("Set Sentiment Threshold (Compound)", -1.0, 1.0, 0.0)
+        alliteration_threshold = st.slider("Set Alliteration Threshold", 0.0, 2.0, 0.5)
 
         # Additional sliders for tone adjustment
-        pos_threshold = st.slider("Set Minimum Positive Tone", 0.0, 1.0, 0.1)
-        neg_threshold = st.slider("Set Maximum Negative Tone", 0.0, 1.0, 0.2)
-        neu_threshold = st.slider("Set Minimum Neutral Tone", 0.0, 1.0, 0.5)
+        pos_threshold = st.slider("Set Minimum Positive Tone", 0.0, 1.0, 0.0)
+        neg_threshold = st.slider("Set Maximum Negative Tone", 0.0, 1.0, 1.0)
+        neu_threshold = st.slider("Set Minimum Neutral Tone", 0.0, 1.0, 0.0)
 
         # Analyze and filter sentences based on sliders
-        filtered_sentences = filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold)
+        filtered_sentences = filter
 
-        st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
-        
-        if len(filtered_sentences) > 0:
-            if st.button('Generate Alliterative Question'):
-                # Display a random sentence from filtered sentences
-                import random
-                sentence = random.choice(filtered_sentences)
-                st.write("Here's a sentence with high alliteration and positive sentiment:")
-                st.write(sentence)
-        else:
-            st.write("No sentences matched the criteria.")
-    else:
-        st.write("Failed to fetch the text file from GitHub.")
-
-if __name__ == "__main__":
-    main()
