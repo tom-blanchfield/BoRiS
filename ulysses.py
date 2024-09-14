@@ -2,6 +2,7 @@ import streamlit as st
 import re
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import requests
+import random
 
 # Initialize the sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
@@ -71,7 +72,7 @@ def main():
     st.title("Ulysses Alliterative Question Generator")
 
     # GitHub raw URL for the Ulysses text file
-    github_raw_url = "https://github.com/tom-blanchfield/BoRiS/blob/main/ulysses.py"
+    github_raw_url = "https://raw.githubusercontent.com/your-username/your-repo/main/ulysses.txt"
     
     # Fetch the text file from GitHub
     try:
@@ -99,7 +100,6 @@ def main():
         if len(filtered_sentences) > 0:
             if st.button('Generate Alliterative Question'):
                 # Display a random sentence from filtered sentences
-                import random
                 sentence = random.choice(filtered_sentences)
                 st.write("Here's a sentence with high alliteration and positive sentiment:")
                 st.write(sentence)
