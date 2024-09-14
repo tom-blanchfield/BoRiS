@@ -42,7 +42,7 @@ def filter_sentences(sentences, sentiment_threshold, alliteration_threshold):
 
 # Streamlit App
 def main():
-    st.title("Ulysses Alliterative Question Generator")
+    st.title("Generate a sentence from Ulysses to your liking")
 
     # GitHub raw URL for the Ulysses text file
     github_raw_url = "https://raw.githubusercontent.com/tom-blanchfield/boris/main/ulysses.txt"
@@ -65,11 +65,11 @@ def main():
         st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
         
         if len(filtered_sentences) > 0:
-            if st.button('Generate Alliterative Question'):
+            if st.button('Generate Sentence'):
                 # Display a random sentence from filtered sentences
                 import random
                 sentence = random.choice(filtered_sentences)
-                st.write("Here's a sentence with high alliteration and positive sentiment:")
+                st.write("Here's a sentence with your choices:")
                 st.write(sentence)
         else:
             st.write("No sentences matched the criteria.")
