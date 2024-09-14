@@ -6,7 +6,7 @@ import requests
 # Initialize the sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
 
-# Function to calculate a stricter alliteration score
+# Function to calculate alliteration score
 def alliteration_score(sentence):
     words = re.findall(r'\b\w+', sentence.lower())
     if not words:
@@ -17,37 +17,35 @@ def alliteration_score(sentence):
         return alliteration_count / len(words)
     return 0
 
-# Simple function to tokenize text into sentences
+# Function to tokenize text into sentences (basic)
 def simple_sent_tokenize(text):
-    # A basic sentence tokenizer using regular expressions
     sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
     sentences = sentence_endings.split(text)
     return sentences
 
-# Function to clean up sentences by removing extraneous punctuation and spaces
+# Function to clean up sentences
 def clean_sentence(sentence):
-    # Remove leading and trailing spaces and commas
     sentence = sentence.strip()
     sentence = re.sub(r'\s+', ' ', sentence)  # Replace multiple spaces with a single space
     sentence = re.sub(r',+', ',', sentence)  # Replace multiple commas with a single comma
     return sentence
 
 # Function to analyze and filter sentences
-def filter_sentences(sentences):
+def filter_sentences(sentences, sentiment_threshold, alliteration_threshold):
     candidate_sentences = []
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
-        if sentiment_scores['compound'] > 0.5 and alliteration_score(sentence) > 1.2:  # Increased threshold
+        if sentiment_scores['compound'] > sentiment_threshold and alliteration_score(sentence) > alliteration_threshold:
             cleaned_sentence = clean_sentence(sentence)
             candidate_sentences.append(cleaned_sentence)
     return candidate_sentences
 
 # Streamlit App
 def main():
-    st.title("Dubliners Sentence Generator")
+    st.title("Ulysses Alliterative Question Generator")
 
-    # GitHub raw URL for the Dubliners text file
-    github_raw_url = "https://raw.githubusercontent.com/tom-blanchfield/BoRiS/b1209408bc162dc9df3f402769bcfe63d150d5f4/dubliners.txt"
+    # GitHub raw URL for the Ulysses text file
+    github_raw_url = "https://raw.githubusercontent.com/your-username/your-repo/main/ulysses.txt"
     
     # Fetch the text file from GitHub
     response = requests.get(github_raw_url)
@@ -57,13 +55,17 @@ def main():
         
         st.write(f"Total Sentences: {len(sentences)}")
 
-        # Analyze and filter sentences
-        filtered_sentences = filter_sentences(sentences)
+        # Add sliders for sentiment and alliteration thresholds
+        sentiment_threshold = st.slider("Set Sentiment Threshold", 0.0, 1.0, 0.5)
+        alliteration_threshold = st.slider("Set Alliteration Threshold", 0.0, 2.0, 1.0)
+
+        # Analyze and filter sentences based on sliders
+        filtered_sentences = filter_sentences(sentences, sentiment_threshold, alliteration_threshold)
 
         st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
         
         if len(filtered_sentences) > 0:
-            if st.button('Generate Another Sentence'):
+            if st.button('Generate Alliterative Question'):
                 # Display a random sentence from filtered sentences
                 import random
                 sentence = random.choice(filtered_sentences)
