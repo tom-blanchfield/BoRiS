@@ -72,7 +72,7 @@ def main():
     st.title("Ulysses Alliterative Question Generator")
 
     # GitHub raw URL for the Ulysses text file
-    github_raw_url = "https://github.com/tom-blanchfield/BoRiS/edit/main/ulysses.py"
+    github_raw_url = "https://github.com/tom-blanchfield/BoRiS/edit/main/ulysses.txt"
     
     # Fetch the text file from GitHub
     try:
