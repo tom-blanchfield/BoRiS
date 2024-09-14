@@ -14,7 +14,7 @@ def alliteration_score(sentence):
     first_letters = [word[0] for word in words if word[0].isalpha()]
     alliteration_count = sum(first_letters.count(letter) for letter in set(first_letters))
     
-        return alliteration_count / len(words)
+    return alliteration_count / len(words)
     return 0
 
 # Simple function to tokenize text into sentences
