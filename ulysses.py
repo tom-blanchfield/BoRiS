@@ -63,7 +63,7 @@ def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos
     st.write("Debug Info: Failed Sentences")
     for fs in failed_sentences:
         st.write(f"Sentence: {fs['sentence']}, Compound: {fs['compound']}, Pos: {fs['pos']}, Neg: {fs['neg']}, Neu: {fs['neu']}, Alliteration: {fs['alliteration']}")
-    
+
     return candidate_sentences
 
 # Streamlit App
@@ -74,8 +74,9 @@ def main():
     github_raw_url = "https://raw.githubusercontent.com/your-username/your-repo/main/ulysses.txt"
     
     # Fetch the text file from GitHub
-    response = requests.get(github_raw_url)
-    if response.status_code == 200:
+    try:
+        response = requests.get(github_raw_url)
+        response.raise_for_status()  # Will raise an HTTPError for bad responses
         text = response.text
         sentences = simple_sent_tokenize(text)
         
@@ -91,5 +92,21 @@ def main():
         neu_threshold = st.slider("Set Minimum Neutral Tone", 0.0, 1.0, 0.0)
 
         # Analyze and filter sentences based on sliders
-        filtered_sentences = filter
+        filtered_sentences = filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold)
 
+        st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
+        
+        if len(filtered_sentences) > 0:
+            if st.button('Generate Alliterative Question'):
+                # Display a random sentence from filtered sentences
+                import random
+                sentence = random.choice(filtered_sentences)
+                st.write("Here's a sentence with high alliteration and positive sentiment:")
+                st.write(sentence)
+        else:
+            st.write("No sentences matched the criteria.")
+    except requests.RequestException as e:
+        st.write(f"Error fetching the text file: {e}")
+
+if __name__ == "__main__":
+    main()
