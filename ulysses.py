@@ -18,13 +18,17 @@ def alliteration_score(sentence):
         return alliteration_count / len(words)
     return 0
 
-# Function to tokenize text into sentences (basic)
+# Function to tokenize text into sentences and clean up sentence fragments
 def simple_sent_tokenize(text):
     sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
     sentences = sentence_endings.split(text)
+    
+    # Clean up any empty or malformed sentences
+    sentences = [s.strip() for s in sentences if s.strip()]
+    
     return sentences
 
-# Function to clean up sentences
+# Function to clean up sentences (remove extra spaces, etc.)
 def clean_sentence(sentence):
     sentence = sentence.strip()
     sentence = re.sub(r'\s+', ' ', sentence)  # Replace multiple spaces with a single space
@@ -72,7 +76,7 @@ def main():
     st.title("Ulysses Alliterative Question Generator")
 
     # GitHub raw URL for the Ulysses text file
-    github_raw_url = "https://github.com/tom-blanchfield/BoRiS/blob/main/ulysses.txt"
+    github_raw_url = "https://raw.githubusercontent.com/your-username/your-repo/main/ulysses.txt"
     
     # Fetch the text file from GitHub
     try:
