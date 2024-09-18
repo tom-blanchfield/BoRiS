@@ -118,7 +118,7 @@ def main():
         st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
         
         if len(filtered_sentences) > 0:
-            if st.button('Generate Alliterative Question'):
+            if st.button('Generate Sentence'):
                 # Display a random sentence from filtered sentences
                 sentence = random.choice(filtered_sentences)
                 st.write("Here's a sentence with high alliteration and positive sentiment:")
