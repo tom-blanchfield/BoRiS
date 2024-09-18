@@ -7,6 +7,34 @@ import random
 # Initialize the sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
 
+# Simple function to tokenize text into sentences
+def simple_sent_tokenize(text):
+    sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
+    sentences = sentence_endings.split(text)
+    return sentences
+
+# Function to clean up sentences by removing extraneous punctuation and spaces
+def clean_sentence(sentence):
+    sentence = sentence.strip()
+    
+    # Remove multiple spaces and multiple commas
+    sentence = re.sub(r'\s+', ' ', sentence)  # Replace multiple spaces with a single space
+    sentence = re.sub(r',+', ',', sentence)  # Replace multiple commas with a single comma
+
+    # Ensure there's a space after commas, and remove spaces before commas or periods
+    sentence = re.sub(r'\s*,\s*', ', ', sentence)
+    sentence = re.sub(r'\s*\.\s*', '.', sentence)
+
+    # Remove commas before periods or other punctuation
+    sentence = re.sub(r',\.', '.', sentence)
+    sentence = re.sub(r',\?', '?', sentence)
+    sentence = re.sub(r',!', '!', sentence)
+
+    # Fix capitalization after periods
+    sentence = re.sub(r'(?<=\.\s)([a-z])', lambda x: x.group(1).upper(), sentence)
+
+    return sentence
+
 # Function to calculate alliteration score
 def alliteration_score(sentence):
     words = re.findall(r'\b\w+', sentence.lower())
@@ -18,50 +46,16 @@ def alliteration_score(sentence):
         return alliteration_count / len(words)
     return 0
 
-# Function to tokenize text into sentences and clean up sentence fragments
-def simple_sent_tokenize(text):
-    sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
-    sentences = sentence_endings.split(text)
-    
-    # Clean up any empty or malformed sentences
-    sentences = [s.strip() for s in sentences if s.strip()]
-    
-    return sentences
-
-# Function to clean up sentences (remove extra spaces, unnecessary quotes, commas, etc.)
-def clean_sentence(sentence):
-    sentence = sentence.strip()
-    
-    # Replace multiple spaces with a single space
-    sentence = re.sub(r'\s+', ' ', sentence)
-    
-    # Replace multiple commas with a single comma
-    sentence = re.sub(r',+', ',', sentence)
-    
-    # Remove extra commas or punctuation in incorrect places
-    sentence = re.sub(r'\s*,\s*', ', ', sentence)  # Ensures there's only one space after a comma
-    sentence = re.sub(r',\s*,', ',', sentence)     # Removes duplicated commas
-    sentence = re.sub(r',\.', '.', sentence)       # Remove commas before periods
-    
-    # Fix uppercase issues
-    sentence = re.sub(r'(?<=\.\s)([a-z])', lambda x: x.group(1).upper(), sentence)  # Uppercase first letter after period
-    
-    # Remove stray quotes
-    sentence = re.sub(r'^"|"$', '', sentence)      # Remove starting and ending quotes if present
-    sentence = re.sub(r'\s*"\s*', '', sentence)    # Remove any remaining stray quotes
-
-    return sentence
-
 # Function to analyze and filter sentences
 def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold):
     candidate_sentences = []
     failed_sentences = 0  # Track the number of failed sentences
-    
+
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
         allit_score = alliteration_score(sentence)
 
-        # Relaxed condition: Allow slightly lower threshold match on sentiment and alliteration
+        # Condition for selecting sentences
         if (sentiment_scores['compound'] >= sentiment_threshold or
             sentiment_scores['pos'] >= pos_threshold or
             sentiment_scores['neu'] >= neu_threshold or
@@ -71,7 +65,7 @@ def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos
             candidate_sentences.append(cleaned_sentence)
         else:
             failed_sentences += 1
-    
+
     # Log the number of failed sentences
     st.write(f"Number of failed sentences: {failed_sentences}")
 
