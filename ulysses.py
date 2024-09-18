@@ -7,13 +7,17 @@ import random
 # Initialize the sentiment analyzer
 analyzer = SentimentIntensityAnalyzer()
 
-# Simple function to tokenize text into sentences
+# Updated function to tokenize text into sentences
 def simple_sent_tokenize(text):
     sentence_endings = re.compile(r'(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s')
     sentences = sentence_endings.split(text)
+    
+    # Ensure proper sentence splitting
+    sentences = [s.strip() for s in sentences if s.strip()]
+    
     return sentences
 
-# Function to clean up sentences by removing extraneous punctuation and spaces
+# Updated function to clean up sentences by removing extraneous punctuation and spaces
 def clean_sentence(sentence):
     sentence = sentence.strip()
     
@@ -21,18 +25,20 @@ def clean_sentence(sentence):
     sentence = re.sub(r'\s+', ' ', sentence)  # Replace multiple spaces with a single space
     sentence = re.sub(r',+', ',', sentence)  # Replace multiple commas with a single comma
 
-    # Ensure there's a space after commas, and remove spaces before commas or periods
+    # Ensure there's a space after commas and periods
     sentence = re.sub(r'\s*,\s*', ', ', sentence)
-    sentence = re.sub(r'\s*\.\s*', '.', sentence)
+    sentence = re.sub(r'\s*\.\s*', '. ', sentence)
+    sentence = re.sub(r'\s*\?\s*', '? ', sentence)
+    sentence = re.sub(r'\s*!$', '!', sentence)
 
     # Remove commas before periods or other punctuation
     sentence = re.sub(r',\.', '.', sentence)
     sentence = re.sub(r',\?', '?', sentence)
     sentence = re.sub(r',!', '!', sentence)
 
-    # Fix capitalization after periods
+    # Capitalize the first letter after periods
     sentence = re.sub(r'(?<=\.\s)([a-z])', lambda x: x.group(1).upper(), sentence)
-
+    
     return sentence
 
 # Function to calculate alliteration score
@@ -109,4 +115,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
