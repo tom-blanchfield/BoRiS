@@ -1,4 +1,4 @@
-import streamlit as st
+from streamlit import st
 import re
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import requests
@@ -28,18 +28,19 @@ def simple_sent_tokenize(text):
     
     return sentences
 
-# Function to clean up sentences (remove extra spaces, etc.)
+# Function to clean up sentences (remove extra spaces, unnecessary quotes, commas, etc.)
 def clean_sentence(sentence):
     sentence = sentence.strip()
     sentence = re.sub(r'\s+', ' ', sentence)  # Replace multiple spaces with a single space
     sentence = re.sub(r',+', ',', sentence)  # Replace multiple commas with a single comma
+    sentence = re.sub(r'^"|"$', '', sentence)  # Remove starting and ending quotes if present
+    sentence = re.sub(r'"\s*$', '', sentence)  # Remove trailing quotes after periods
+    sentence = re.sub(r'\s*"\s*', '', sentence)  # Remove any remaining stray quotes
     return sentence
 
 # Function to analyze and filter sentences
 def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold):
     candidate_sentences = []
-    
-    # For debugging, let's store failed sentences and why they failed
     failed_sentences = []
     
     for sentence in sentences:
@@ -109,6 +110,12 @@ def main():
                 st.write(sentence)
         else:
             st.write("No sentences matched the criteria.")
+    except requests.RequestException as e:
+        st.write(f"Error fetching the text file: {e}")
+
+if __name__ == "__main__":
+    main()
+
     except requests.RequestException as e:
         st.write(f"Error fetching the text file: {e}")
 
