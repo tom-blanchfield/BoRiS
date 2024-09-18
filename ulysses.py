@@ -1,4 +1,4 @@
-from streamlit import st
+import streamlit as st
 import re
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import requests
