@@ -30,13 +30,28 @@ def simple_sent_tokenize(text):
 
 # Function to clean up sentences (remove extra spaces, unnecessary quotes, commas, etc.)
 def clean_sentence(sentence):
+    # Step 1: Strip leading and trailing spaces
     sentence = sentence.strip()
-    sentence = re.sub(r'\s+', ' ', sentence)  # Replace multiple spaces with a single space
-    sentence = re.sub(r',+', ',', sentence)  # Replace multiple commas with a single comma
-    sentence = re.sub(r'^"|"$', '', sentence)  # Remove starting and ending quotes if present
+    
+    # Step 2: Replace multiple spaces with a single space
+    sentence = re.sub(r'\s+', ' ', sentence)
+    
+    # Step 3: Replace multiple commas with a single comma
+    sentence = re.sub(r',+', ',', sentence)
+    
+    # Step 4: Remove misplaced commas (e.g., "who,was" should be "who was")
+    sentence = re.sub(r'(?<=\w),(?=\w)', ', ', sentence)
+    
+    # Step 5: Remove leading or trailing commas
+    sentence = re.sub(r'^,|,$', '', sentence)
+    
+    # Step 6: Remove stray quotes
+    sentence = re.sub(r'^"|"$', '', sentence)  # Remove quotes at the start/end
     sentence = re.sub(r'"\s*$', '', sentence)  # Remove trailing quotes after periods
     sentence = re.sub(r'\s*"\s*', '', sentence)  # Remove any remaining stray quotes
+    
     return sentence
+
 
 # Function to analyze and filter sentences
 def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold):
