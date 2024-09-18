@@ -47,7 +47,7 @@ def alliteration_score(sentence):
     return 0
 
 # Function to analyze and filter sentences
-def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold):
+def filter_sentences(sentences, alliteration_threshold, pos_threshold, neg_threshold):
     candidate_sentences = []
     failed_sentences = 0  # Track the number of failed sentences
 
@@ -55,11 +55,10 @@ def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos
         sentiment_scores = analyzer.polarity_scores(sentence)
         allit_score = alliteration_score(sentence)
 
-        # Condition for selecting sentences
-        if (sentiment_scores['compound'] >= sentiment_threshold or
-            sentiment_scores['pos'] >= pos_threshold or
-            sentiment_scores['neu'] >= neu_threshold or
-            allit_score >= alliteration_threshold) and sentiment_scores['neg'] <= neg_threshold:
+        # Condition for selecting sentences based on alliteration, positive tone, and negative tone
+        if (sentiment_scores['pos'] >= pos_threshold and 
+            sentiment_scores['neg'] <= neg_threshold and 
+            allit_score >= alliteration_threshold):
             
             cleaned_sentence = clean_sentence(sentence)
             candidate_sentences.append(cleaned_sentence)
@@ -87,17 +86,13 @@ def main():
         
         st.write(f"Total Sentences: {len(sentences)}")
 
-        # Add sliders for sentiment and alliteration thresholds
-        sentiment_threshold = st.slider("Set Sentiment Threshold (Compound)", -1.0, 1.0, 0.0)
+        # Add sliders for alliteration, positive tone, and negative tone thresholds
         alliteration_threshold = st.slider("Set Alliteration Threshold", 0.0, 2.0, 0.5)
-
-        # Additional sliders for tone adjustment
-        pos_threshold = st.slider("Set Minimum Positive Tone", 0.0, 1.0, 0.0)
-        neg_threshold = st.slider("Set Maximum Negative Tone", 0.0, 1.0, 1.0)
-        neu_threshold = st.slider("Set Minimum Neutral Tone", 0.0, 1.0, 0.0)
+        pos_threshold = st.slider("Set Minimum Positive Tone", 0.0, 1.0, 0.1)
+        neg_threshold = st.slider("Set Maximum Negative Tone", 0.0, 1.0, 0.3)
 
         # Analyze and filter sentences based on sliders
-        filtered_sentences = filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold)
+        filtered_sentences = filter_sentences(sentences, alliteration_threshold, pos_threshold, neg_threshold)
 
         st.write(f"Filtered Sentences Count: {len(filtered_sentences)}")
         
