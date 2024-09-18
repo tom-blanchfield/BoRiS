@@ -31,11 +31,25 @@ def simple_sent_tokenize(text):
 # Function to clean up sentences (remove extra spaces, unnecessary quotes, commas, etc.)
 def clean_sentence(sentence):
     sentence = sentence.strip()
-    sentence = re.sub(r'\s+', ' ', sentence)  # Replace multiple spaces with a single space
-    sentence = re.sub(r',+', ',', sentence)  # Replace multiple commas with a single comma
-    sentence = re.sub(r'^"|"$', '', sentence)  # Remove starting and ending quotes if present
-    sentence = re.sub(r'"\s*$', '', sentence)  # Remove trailing quotes after periods
-    sentence = re.sub(r'\s*"\s*', '', sentence)  # Remove any remaining stray quotes
+    
+    # Replace multiple spaces with a single space
+    sentence = re.sub(r'\s+', ' ', sentence)
+    
+    # Replace multiple commas with a single comma
+    sentence = re.sub(r',+', ',', sentence)
+    
+    # Remove extra commas or punctuation in incorrect places
+    sentence = re.sub(r'\s*,\s*', ', ', sentence)  # Ensures there's only one space after a comma
+    sentence = re.sub(r',\s*,', ',', sentence)     # Removes duplicated commas
+    sentence = re.sub(r',\.', '.', sentence)       # Remove commas before periods
+    
+    # Fix uppercase issues
+    sentence = re.sub(r'(?<=\.\s)([a-z])', lambda x: x.group(1).upper(), sentence)  # Uppercase first letter after period
+    
+    # Remove stray quotes
+    sentence = re.sub(r'^"|"$', '', sentence)      # Remove starting and ending quotes if present
+    sentence = re.sub(r'\s*"\s*', '', sentence)    # Remove any remaining stray quotes
+
     return sentence
 
 # Function to analyze and filter sentences
