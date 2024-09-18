@@ -41,7 +41,7 @@ def clean_sentence(sentence):
 # Function to analyze and filter sentences
 def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold):
     candidate_sentences = []
-    failed_sentences = []
+    failed_sentences = 0  # Track the number of failed sentences
     
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
@@ -56,19 +56,10 @@ def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos
             cleaned_sentence = clean_sentence(sentence)
             candidate_sentences.append(cleaned_sentence)
         else:
-            failed_sentences.append({
-                'sentence': sentence,
-                'compound': sentiment_scores['compound'],
-                'pos': sentiment_scores['pos'],
-                'neg': sentiment_scores['neg'],
-                'neu': sentiment_scores['neu'],
-                'alliteration': allit_score
-            })
+            failed_sentences += 1
     
-    # Log failed sentences and why they were filtered out
-    st.write("Debug Info: Failed Sentences")
-    for fs in failed_sentences:
-        st.write(f"Sentence: {fs['sentence']}, Compound: {fs['compound']}, Pos: {fs['pos']}, Neg: {fs['neg']}, Neu: {fs['neu']}, Alliteration: {fs['alliteration']}")
+    # Log the number of failed sentences
+    st.write(f"Number of failed sentences: {failed_sentences}")
 
     return candidate_sentences
 
@@ -115,4 +106,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
