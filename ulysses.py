@@ -116,8 +116,4 @@ def main():
 if __name__ == "__main__":
     main()
 
-    except requests.RequestException as e:
-        st.write(f"Error fetching the text file: {e}")
 
-if __name__ == "__main__":
-    main()
