@@ -73,7 +73,7 @@ def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos
 
 # Streamlit App
 def main():
-    st.title("Ulysses Alliterative Question Generator")
+    st.title("Ulysses Sentences")
 
     # GitHub raw URL for the Ulysses text file
     github_raw_url = "https://github.com/tom-blanchfield/BoRiS/blob/main/ulysses.txt"
