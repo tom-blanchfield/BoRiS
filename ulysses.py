@@ -52,21 +52,20 @@ def clean_sentence(sentence):
     
     return sentence
 
-
 # Function to analyze and filter sentences
 def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold):
     candidate_sentences = []
     failed_sentences = []
-    
+
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
         allit_score = alliteration_score(sentence)
 
-        # Relaxed condition: Allow slightly lower threshold match on sentiment and alliteration
-        if (sentiment_scores['compound'] >= sentiment_threshold or
-            sentiment_scores['pos'] >= pos_threshold or
-            sentiment_scores['neu'] >= neu_threshold or
-            allit_score >= alliteration_threshold) and sentiment_scores['neg'] <= neg_threshold:
+        # Stricter condition: Require both a minimum sentiment threshold and an alliteration threshold
+        if (sentiment_scores['compound'] >= sentiment_threshold and  # Compound sentiment must be high
+            sentiment_scores['pos'] >= pos_threshold and  # Positive tone must be above threshold
+            allit_score >= alliteration_threshold and  # Alliteration must be above threshold
+            sentiment_scores['neg'] <= neg_threshold):  # Negative sentiment should be below threshold
             
             cleaned_sentence = clean_sentence(sentence)
             candidate_sentences.append(cleaned_sentence)
@@ -79,8 +78,8 @@ def filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos
                 'neu': sentiment_scores['neu'],
                 'alliteration': allit_score
             })
-    
-    # Log failed sentences and why they were filtered out
+
+    # Debugging output: Check why sentences were rejected
     st.write("Debug Info: Failed Sentences")
     for fs in failed_sentences:
         st.write(f"Sentence: {fs['sentence']}, Compound: {fs['compound']}, Pos: {fs['pos']}, Neg: {fs['neg']}, Neu: {fs['neu']}, Alliteration: {fs['alliteration']}")
@@ -104,13 +103,13 @@ def main():
         st.write(f"Total Sentences: {len(sentences)}")
 
         # Add sliders for sentiment and alliteration thresholds
-        sentiment_threshold = st.slider("Set Sentiment Threshold (Compound)", -1.0, 1.0, 0.0)
-        alliteration_threshold = st.slider("Set Alliteration Threshold", 0.0, 2.0, 0.5)
+        sentiment_threshold = st.slider("Set Sentiment Threshold (Compound)", -1.0, 1.0, 0.5)  # Start at 0.5 for positivity
+        alliteration_threshold = st.slider("Set Alliteration Threshold", 0.0, 2.0, 0.8)  # Require high alliteration
 
         # Additional sliders for tone adjustment
-        pos_threshold = st.slider("Set Minimum Positive Tone", 0.0, 1.0, 0.0)
-        neg_threshold = st.slider("Set Maximum Negative Tone", 0.0, 1.0, 1.0)
-        neu_threshold = st.slider("Set Minimum Neutral Tone", 0.0, 1.0, 0.0)
+        pos_threshold = st.slider("Set Minimum Positive Tone", 0.0, 1.0, 0.3)  # Require some positivity
+        neg_threshold = st.slider("Set Maximum Negative Tone", 0.0, 1.0, 0.2)  # Keep negativity low
+        neu_threshold = st.slider("Set Minimum Neutral Tone", 0.0, 1.0, 0.0)  # Keep neutral tone flexible
 
         # Analyze and filter sentences based on sliders
         filtered_sentences = filter_sentences(sentences, sentiment_threshold, alliteration_threshold, pos_threshold, neg_threshold, neu_threshold)
@@ -130,5 +129,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
