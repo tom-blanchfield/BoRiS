@@ -61,10 +61,6 @@ def filter_sentences(sentences, alliteration_threshold, pos_threshold, neg_thres
         sentiment_scores = analyzer.polarity_scores(sentence)
         allit_score = alliteration_score(sentence)
 
-        # Debugging output to check the alliteration score of each sentence
-        st.write(f"Sentence: {sentence}")
-        st.write(f"Alliteration Score: {allit_score}")
-
         # Condition for selecting sentences based on alliteration, positive tone, and negative tone
         if (sentiment_scores['pos'] >= pos_threshold and 
             sentiment_scores['neg'] <= neg_threshold and 
@@ -84,8 +80,8 @@ def filter_sentences(sentences, alliteration_threshold, pos_threshold, neg_thres
 def main():
     st.title("Ulysses Sentences")
 
-    # GitHub raw URL for the Ulysses text file
-    github_raw_url = "https://github.com/tom-blanchfield/BoRiS/blob/main/ulysses.txt"
+    # Corrected GitHub raw URL for the Ulysses text file
+    github_raw_url = "https://raw.githubusercontent.com/tom-blanchfield/BoRiS/main/ulysses.txt"
     
     # Fetch the text file from GitHub
     try:
