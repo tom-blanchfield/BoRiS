@@ -93,7 +93,7 @@ def main():
         st.write(f"Total Sentences: {len(sentences)}")
 
         # Add sliders for alliteration, positive tone, and negative tone thresholds
-        alliteration_threshold = st.slider("Set Alliteration Threshold", 0.0, 2.0, 0.5)
+        alliteration_threshold = st.slider("Set Alliteration Threshold", 0.0, 1.0, 0.5)
         pos_threshold = st.slider("Set Minimum Positive Tone", 0.0, 1.0, 0.1)
         neg_threshold = st.slider("Set Maximum Negative Tone", 0.0, 1.0, 0.3)
 
