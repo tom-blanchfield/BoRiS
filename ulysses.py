@@ -41,23 +41,16 @@ def clean_sentence(sentence):
     
     return sentence
 
-# Updated function to calculate alliteration score
+# Original function to calculate alliteration score
 def alliteration_score(sentence):
     words = re.findall(r'\b\w+', sentence.lower())
     if not words:
         return 0
     first_letters = [word[0] for word in words if word[0].isalpha()]
-    
-    # Count how often each letter appears as the first letter in words
-    first_letter_counts = {letter: first_letters.count(letter) for letter in set(first_letters)}
-    
-    # Find the most common first letter and its frequency
-    most_common_letter_count = max(first_letter_counts.values())
-    
-    # Alliteration score is based on the proportion of words starting with the same letter
-    alliteration_ratio = most_common_letter_count / len(words)
-    
-    return alliteration_ratio
+    alliteration_count = sum(first_letters.count(letter) for letter in set(first_letters))
+    if len(words) > 2:
+        return alliteration_count / len(words)
+    return 0
 
 # Function to analyze and filter sentences
 def filter_sentences(sentences, alliteration_threshold, pos_threshold, neg_threshold):
