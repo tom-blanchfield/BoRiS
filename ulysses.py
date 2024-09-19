@@ -41,16 +41,23 @@ def clean_sentence(sentence):
     
     return sentence
 
-# Function to calculate alliteration score
+# Updated function to calculate alliteration score
 def alliteration_score(sentence):
     words = re.findall(r'\b\w+', sentence.lower())
     if not words:
         return 0
     first_letters = [word[0] for word in words if word[0].isalpha()]
-    alliteration_count = sum(first_letters.count(letter) for letter in set(first_letters))
-    if len(words) > 2:
-        return len(words)/alliteration_count
-    return 0
+    
+    # Count how often each letter appears as the first letter in words
+    first_letter_counts = {letter: first_letters.count(letter) for letter in set(first_letters)}
+    
+    # Find the most common first letter and its frequency
+    most_common_letter_count = max(first_letter_counts.values())
+    
+    # Alliteration score is based on the proportion of words starting with the same letter
+    alliteration_ratio = most_common_letter_count / len(words)
+    
+    return alliteration_ratio
 
 # Function to analyze and filter sentences
 def filter_sentences(sentences, alliteration_threshold, pos_threshold, neg_threshold):
@@ -60,6 +67,10 @@ def filter_sentences(sentences, alliteration_threshold, pos_threshold, neg_thres
     for sentence in sentences:
         sentiment_scores = analyzer.polarity_scores(sentence)
         allit_score = alliteration_score(sentence)
+
+        # Debugging output to check the alliteration score of each sentence
+        st.write(f"Sentence: {sentence}")
+        st.write(f"Alliteration Score: {allit_score}")
 
         # Condition for selecting sentences based on alliteration, positive tone, and negative tone
         if (sentiment_scores['pos'] >= pos_threshold and 
