@@ -21,7 +21,7 @@ book_data = pd.merge(book_data, tags, on='tag_id')
 genre_list = ["comedy", "literature", "irish", "superheroes", "science", "young-adult", "science-fiction", "romance", "erotic", "mystery", "fantasy", "horror",
               "paranormal", "thriller", "western", "dystopian", "memoir", "biography", "autobiography", "history",
               "travel", "cookbook", "self-help", "business", "finance", "war", "psychology", "philosophy", "religion",
-              "art", "music", "comics", "graphic-novels", "poetry", "football", "sport", "funny"]
+              "art", "music", "comics", "graphic-novels", "poetry", "football", "sport", "funny", "dirty"]
 
 # Get the list of all authors
 all_authors = list(set(books['authors'].apply(lambda x: x.split(',')[0].strip())))
