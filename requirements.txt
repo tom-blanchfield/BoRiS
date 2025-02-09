@@ -6,7 +6,6 @@ requests
 altair
 seaborn
 matplotlib
-surprise
 nltk
 uuid
 streamlit==1.6
