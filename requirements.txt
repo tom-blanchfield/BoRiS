@@ -6,5 +6,5 @@ requests
 altair
 seaborn
 matplotlib
-
+surprise
 
