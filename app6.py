@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+numpy.import_array()
 import sklearn.metrics.pairwise as pw
 import streamlit as st
 
