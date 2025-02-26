@@ -6,7 +6,7 @@ import streamlit as st
 import altair as alt
 import seaborn as sns
 import matplotlib.pyplot as plt
-st.set_option('deprecation.showPyplotGlobalUse', False)
+# st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Load the data
 books = pd.read_csv('books.csv')
