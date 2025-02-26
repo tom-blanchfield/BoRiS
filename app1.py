@@ -89,7 +89,7 @@ for column_idx, book in grouped_data.iterrows():
         with columns[column_idx % 3]:
             st.image(resized_image,
                      caption=f"{title} by {books.loc[books['book_id'] == book_id, 'authors'.strip()].values[0]}",
-                     use_column_width=True)
+                     use_container_width=True)
 
         # Add rating of 5 to user's books
         user_ratings = pd.concat(
@@ -177,7 +177,7 @@ if st.button("Get Recommendations!"):
 
                     # Display the book cover image, title, and author
                     with columns[column_idx % 3]:
-                        st.image(resized_image, caption=f"{title} by {author}", use_column_width=True)
+                        st.image(resized_image, caption=f"{title} by {author}", use_container_width=True)
 
                 except (requests.HTTPError, OSError) as e:
                     st.write(f"Error loading image: {e}")
